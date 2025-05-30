@@ -1,0 +1,168 @@
+
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agenda Médica de Eva e Elza</title>
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+      background-color: #fff;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    input, select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .error-message {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+    .success-message {
+      color: green;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Agenda médica de Eva e Elza</h1>
+  <p id="dataHoraAtual"></p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Paciente</th>
+        <th>Data</th>
+        <th>Hora</th>
+        <th>Procedimento</th>
+        <th>Especialidade</th>
+        <th>Local</th>
+        <th>Ação</th>
+      </tr>
+    </thead>
+    <tbody id="agendaTabela">
+      <!-- Linhas de agendamentos serão inseridas aqui -->
+    </tbody>
+  </table>
+
+  <div>
+    <label for="data">Data:</label>
+    <input type="date" id="data" name="data">
+
+    <label for="hora">Hora:</label>
+    <input type="time" id="hora" name="hora">
+
+    <label for="procedimento">Procedimento:</label>
+    <input type="text" id="procedimento" name="procedimento">
+
+    <label for="especialidade">Especialidade:</label>
+    <input type="text" id="especialidade" name="especialidade">
+
+    <label for="local">Local:</label>
+    <input type="text" id="local" name="local">
+
+    <label for="paciente">Paciente:</label>
+    <select id="paciente" name="paciente">
+      <option value="Eva">Eva</option>
+      <option value="Elza">Elza</option>
+    </select>
+
+    <button onclick="adicionarAgendamento()">Adicionar Agendamento</button>
+    <p id="errorMessage" class="error-message"></p> <!-- Mensagem de erro aqui -->
+    <p id="successMessage" class="success-message"></p> <!-- Mensagem de sucesso aqui -->
+  </div>
+
+  <div>
+    <label for="filtroPaciente">Filtrar por Paciente:</label>
+    <select id="filtroPaciente">
+      <option value="">Todos</option>
+      <option value="Eva">Eva</option>
+      <option value="Elza">Elza</option>
+    </select>
+    <button onclick="filtrarAgendamentos()">Filtrar</button>
+  </div>
+
+  <!-- Firebase Script (Versão não modular) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script>
+    // Configuração do Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyA_mJkkpL87mTlRkbPRxHuxObPE1PqqlgE",
+      authDomain: "agenda-medica---eva-e-elza.firebaseapp.com",
+      databaseURL: "https://agenda-medica---eva-e-elza-default-rtdb.firebaseio.com/",  // Coloque a URL correta aqui
+      projectId: "agenda-medica---eva-e-elza",
+      storageBucket: "agenda-medica---eva-e-elza.firebasestorage.app",
+      messagingSenderId: "664880376825",
+      appId: "1:664880376825:web:3a392e1da6ce2eedf12b28"
+    };
+
+    // Inicializa o Firebase
+    firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+
+    // Verificar se o navegador permite notificações
+    if (!("Notification" in window)) {
+      alert("Seu navegador não suporta notificações");
+    }
+
+    // Solicitar permissão para notificação
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
+
+    // Função para exibir notificações
+    function exibirNotificacao(titulo, corpo) {
+      if (Notification.permission === "granted") {
+        new Notification(titulo, { body: corpo });
+      }
+    }
+
+    // Função de adicionar e editar agendamentos
+    function adicionarAgendamento() {
+      // Aqui vai a lógica para adicionar/agendar o agendamento
+      // Isso inclui validação e integração com o Firebase
+    }
+
+    // Função de filtrar agendamentos
+    function filtrarAgendamentos() {
+      // Filtra os agendamentos de acordo com os critérios
+    }
+  </script>
+</body>
+</html>
