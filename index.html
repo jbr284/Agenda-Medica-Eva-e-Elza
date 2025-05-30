@@ -1,11 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda Médica de Eva e Elza</title>
-  <link rel="manifest" href="/manifest.json">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -83,19 +81,19 @@
   <div>
     <label for="data">Data:</label>
     <input type="date" id="data" name="data">
-
+    
     <label for="hora">Hora:</label>
     <input type="time" id="hora" name="hora">
-
+    
     <label for="procedimento">Procedimento:</label>
     <input type="text" id="procedimento" name="procedimento">
-
+    
     <label for="especialidade">Especialidade:</label>
     <input type="text" id="especialidade" name="especialidade">
-
+    
     <label for="local">Local:</label>
     <input type="text" id="local" name="local">
-
+    
     <label for="paciente">Paciente:</label>
     <select id="paciente" name="paciente">
       <option value="Eva">Eva</option>
@@ -153,15 +151,188 @@
       }
     }
 
-    // Função de adicionar e editar agendamentos
-    function adicionarAgendamento() {
-      // Aqui vai a lógica para adicionar/agendar o agendamento
-      // Isso inclui validação e integração com o Firebase
+    // Exibir data e hora atual
+    function exibirDataHoraAtual() {
+      const dataHoraAtual = new Date();
+      const dataFormatada = dataHoraAtual.toLocaleString();
+      document.getElementById('dataHoraAtual').innerText = `Data e hora atual: ${dataFormatada}`;
     }
 
-    // Função de filtrar agendamentos
+    setInterval(exibirDataHoraAtual, 1000); // Atualiza a data/hora a cada segundo
+
+    // Adicionar agendamento no Firebase
+    function adicionarAgendamento() {
+      const data = document.getElementById('data').value;
+      const hora = document.getElementById('hora').value;
+      const procedimento = document.getElementById('procedimento').value;
+      const especialidade = document.getElementById('especialidade').value;
+      const local = document.getElementById('local').value;
+      const paciente = document.getElementById('paciente').value;
+      const errorMessage = document.getElementById('errorMessage');
+      const successMessage = document.getElementById('successMessage');
+
+      if (!validarCampos()) return;
+
+      // Validar se a data é anterior à data atual
+      const dataEscolhida = new Date(data);
+      const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0);
+
+      if (dataEscolhida < hoje) {
+        errorMessage.innerText = "Erro: Não é possível agendar para uma data anterior à data atual.";
+        successMessage.innerText = "";
+        return;
+      } else {
+        errorMessage.innerText = "";
+      }
+
+      const novoAgendamento = {
+        data: data,
+        hora: hora,
+        procedimento: procedimento,
+        especialidade: especialidade,
+        local: local,
+        paciente: paciente,
+        timestamp: new Date().toISOString()
+      };
+
+      const referencia = database.ref('agendamentos');
+      referencia.push(novoAgendamento).then(() => {
+        successMessage.innerText = "Agendamento adicionado com sucesso!";
+        errorMessage.innerText = "";
+
+        // Limpar os campos após confirmação
+        limparCampos();
+        
+        // Verificar se o agendamento é para amanhã e enviar uma notificação
+        const dataAgendamento = new Date(data);
+        const dataAtual = new Date();
+        const diffTime = dataAgendamento - dataAtual;
+        const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24)); // Diferença em dias
+
+        if (diffDays === 1) {
+          exibirNotificacao("Lembrete de Agendamento", `Você tem um agendamento amanhã às ${hora} para ${procedimento} - ${especialidade}.`);
+        }
+      });
+    }
+
+    // Limpar os campos do formulário
+    function limparCampos() {
+      document.getElementById('data').value = '';
+      document.getElementById('hora').value = '';
+      document.getElementById('procedimento').value = '';
+      document.getElementById('especialidade').value = '';
+      document.getElementById('local').value = '';
+      document.getElementById('paciente').value = 'Eva';  // ou 'Elza', conforme necessário
+    }
+
+    // Validar campos do formulário
+    function validarCampos() {
+      const data = document.getElementById('data').value;
+      const hora = document.getElementById('hora').value;
+      const procedimento = document.getElementById('procedimento').value;
+      const especialidade = document.getElementById('especialidade').value;
+      const local = document.getElementById('local').value;
+      const paciente = document.getElementById('paciente').value;
+
+      if (!data || !hora || !procedimento || !especialidade || !local || !paciente) {
+        alert("Por favor, preencha todos os campos.");
+        return false;
+      }
+      return true;
+    }
+
+    // Sincronização com Firebase em tempo real
+    const agendaRef = database.ref('agendamentos');
+    agendaRef.on('value', function(snapshot) {
+      const agendamentos = snapshot.val();
+      const tabela = document.getElementById('agendaTabela');
+      tabela.innerHTML = ''; // Limpar a tabela
+
+      const listaAgendamentos = Object.keys(agendamentos).map(key => {
+        return {
+          id: key,
+          ...agendamentos[key]
+        };
+      });
+
+      listaAgendamentos.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+      listaAgendamentos.forEach(agendamento => {
+        const data = new Date(agendamento.data);
+        const dia = String(data.getDate()).padStart(2, '0');
+        const mes = String(data.getMonth() + 1).padStart(2, '0');
+        const ano = data.getFullYear();
+
+        const dataFormatada = `${dia}/${mes}/${ano}`;
+        
+        const row = tabela.insertRow();
+        row.innerHTML = `
+          <td>${agendamento.paciente}</td>
+          <td>${dataFormatada}</td>
+          <td>${agendamento.hora}</td>
+          <td>${agendamento.procedimento}</td>
+          <td>${agendamento.especialidade}</td>
+          <td>${agendamento.local}</td>
+          <td><button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button></td>
+        `;
+      });
+    });
+
+    // Confirmar exclusão
+    function confirmarExclusao(key) {
+      const confirmacao = window.confirm("Tem certeza que deseja excluir este agendamento?");
+      if (confirmacao) {
+        excluirAgendamento(key);
+      }
+    }
+
+    // Excluir agendamento
+    function excluirAgendamento(key) {
+      const agendamentoRef = database.ref('agendamentos/' + key);
+      agendamentoRef.remove();
+    }
+
+    // Filtrar agendamentos
     function filtrarAgendamentos() {
-      // Filtra os agendamentos de acordo com os critérios
+      const pacienteFiltro = document.getElementById('filtroPaciente').value;
+      const agendamentosRef = database.ref('agendamentos');
+      agendamentosRef.once('value', function(snapshot) {
+        const agendamentos = snapshot.val();
+        const tabela = document.getElementById('agendaTabela');
+        tabela.innerHTML = '';
+
+        const listaAgendamentos = Object.keys(agendamentos).map(key => ({
+          id: key,
+          ...agendamentos[key]
+        }));
+
+        const agendamentosFiltrados = listaAgendamentos.filter(agendamento => 
+          pacienteFiltro === "" || agendamento.paciente === pacienteFiltro
+        );
+
+        agendamentosFiltrados.sort((a, b) => new Date(a.data) - new Date(b.data));
+
+        agendamentosFiltrados.forEach(agendamento => {
+          const data = new Date(agendamento.data);
+          const dia = String(data.getDate()).padStart(2, '0');
+          const mes = String(data.getMonth() + 1).padStart(2, '0');
+          const ano = data.getFullYear();
+
+          const dataFormatada = `${dia}/${mes}/${ano}`;
+
+          const row = tabela.insertRow();
+          row.innerHTML = `
+            <td>${agendamento.paciente}</td>
+            <td>${dataFormatada}</td>
+            <td>${agendamento.hora}</td>
+            <td>${agendamento.procedimento}</td>
+            <td>${agendamento.especialidade}</td>
+            <td>${agendamento.local}</td>
+            <td><button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button></td>
+          `;
+        });
+      });
     }
   </script>
 </body>
