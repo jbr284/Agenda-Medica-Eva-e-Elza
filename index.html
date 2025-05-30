@@ -166,7 +166,7 @@
     function adicionarAgendamento() {
       if (!validarCampos()) return;
 
-      const data = document.getElementById('data').value;
+      let data = document.getElementById('data').value;
       const hora = document.getElementById('hora').value;
       const procedimento = document.getElementById('procedimento').value;
       const especialidade = document.getElementById('especialidade').value;
@@ -175,14 +175,18 @@
       const errorMessage = document.getElementById('errorMessage');
       const successMessage = document.getElementById('successMessage');
 
+      // Converter a data para o formato correto, levando em consideração o fuso horário local
+      const dataEscolhida = new Date(data);  // Criar um objeto Date a partir da string
+
+      // Garantir que a data está no formato UTC correto
+      const utcData = new Date(dataEscolhida.getTime() - (dataEscolhida.getTimezoneOffset() * 60000));
+      const dataFormatada = utcData.toISOString().split('T')[0]; // Obtendo a data no formato YYYY-MM-DD
+
       // Validar se a data é anterior à data atual
-      const dataEscolhida = new Date(data);
       const hoje = new Date();
+      hoje.setHours(0, 0, 0, 0); // Remover as horas da data atual para comparar com a data selecionada
 
-      // Remover a hora de hoje para comparar apenas a data
-      hoje.setHours(0, 0, 0, 0);
-
-      if (dataEscolhida < hoje) {
+      if (utcData < hoje) {
         errorMessage.innerText = "Erro: Não é possível agendar para uma data anterior à data atual.";
         successMessage.innerText = "";
         return;
@@ -191,7 +195,7 @@
       }
 
       const novoAgendamento = {
-        data: data,
+        data: dataFormatada,
         hora: hora,
         procedimento: procedimento,
         especialidade: especialidade,
