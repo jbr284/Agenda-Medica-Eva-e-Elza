@@ -1,10 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda Médica de Eva e Elza</title>
-  <link rel="manifest" href="/manifest.json">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -60,7 +60,6 @@
 <body>
 
   <h1>Agenda médica de Eva e Elza</h1>
-  <p id="dataHoraAtual"></p>
 
   <table>
     <thead>
@@ -80,8 +79,8 @@
   </table>
 
   <div>
-    <label for="data">Data:</label>
-    <input type="date" id="data" name="data">
+    <label for="data">Data (DD/MM/AA):</label>
+    <input type="text" id="data" name="data" placeholder="Digite a data (DD/MM/AA)">
     
     <label for="hora">Hora:</label>
     <input type="time" id="hora" name="hora">
@@ -106,16 +105,6 @@
     <p id="successMessage" class="success-message"></p> <!-- Mensagem de sucesso aqui -->
   </div>
 
-  <div>
-    <label for="filtroPaciente">Filtrar por Paciente:</label>
-    <select id="filtroPaciente">
-      <option value="">Todos</option>
-      <option value="Eva">Eva</option>
-      <option value="Elza">Elza</option>
-    </select>
-    <button onclick="filtrarAgendamentos()">Filtrar</button>
-  </div>
-
   <!-- Firebase Script (Versão não modular) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -124,7 +113,7 @@
     const firebaseConfig = {
       apiKey: "AIzaSyA_mJkkpL87mTlRkbPRxHuxObPE1PqqlgE",
       authDomain: "agenda-medica---eva-e-elza.firebaseapp.com",
-      databaseURL: "https://agenda-medica---eva-e-elza-default-rtdb.firebaseio.com/",  // Coloque a URL correta aqui
+      databaseURL: "https://agenda-medica---eva-e-elza-default-rtdb.firebaseio.com/",  
       projectId: "agenda-medica---eva-e-elza",
       storageBucket: "agenda-medica---eva-e-elza.firebasestorage.app",
       messagingSenderId: "664880376825",
@@ -135,16 +124,7 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
-    // Exibir data e hora atual
-    function exibirDataHoraAtual() {
-      const dataHoraAtual = new Date();
-      const dataFormatada = dataHoraAtual.toLocaleString();
-      document.getElementById('dataHoraAtual').innerText = `Data e hora atual: ${dataFormatada}`;
-    }
-
-    setInterval(exibirDataHoraAtual, 1000); // Atualiza a data/hora a cada segundo
-
-    // Validar campos do formulário
+    // Função para validar os campos obrigatórios
     function validarCampos() {
       const data = document.getElementById('data').value;
       const hora = document.getElementById('hora').value;
@@ -160,78 +140,39 @@
       return true;
     }
 
-    // Adicionar ou editar agendamento no Firebase
-    let agendamentoEmEdicao = null; // Variável para controlar se estamos editando um agendamento
-
-    function adicionarAgendamento() {
-      if (!validarCampos()) return;
-
-      let data = document.getElementById('data').value;
-      const hora = document.getElementById('hora').value;
-      const procedimento = document.getElementById('procedimento').value;
-      const especialidade = document.getElementById('especialidade').value;
-      const local = document.getElementById('local').value;
-      const paciente = document.getElementById('paciente').value;
-      const errorMessage = document.getElementById('errorMessage');
-      const successMessage = document.getElementById('successMessage');
-
-      // Converter a data para o formato correto, levando em consideração o fuso horário local
-      const dataEscolhida = new Date(data);  // Criar um objeto Date a partir da string
-
-      // Garantir que a data está no formato UTC correto
-      const utcData = new Date(dataEscolhida.getTime() - (dataEscolhida.getTimezoneOffset() * 60000));
-      const dataFormatada = utcData.toISOString().split('T')[0]; // Obtendo a data no formato YYYY-MM-DD
-
-      // Validar se a data é anterior à data atual
-      const hoje = new Date();
-      hoje.setHours(0, 0, 0, 0); // Remover as horas da data atual para comparar com a data selecionada
-
-      if (utcData < hoje) {
-        errorMessage.innerText = "Erro: Não é possível agendar para uma data anterior à data atual.";
-        successMessage.innerText = "";
-        return;
-      } else {
-        errorMessage.innerText = "";
-      }
-
-      const novoAgendamento = {
-        data: dataFormatada,
-        hora: hora,
-        procedimento: procedimento,
-        especialidade: especialidade,
-        local: local,
-        paciente: paciente,
-        timestamp: new Date().toISOString()
-      };
-
-      if (agendamentoEmEdicao) {
-        // Se estivermos editando, atualizamos o agendamento
-        const agendamentoRef = database.ref('agendamentos/' + agendamentoEmEdicao);
-        agendamentoRef.update(novoAgendamento).then(() => {
-          successMessage.innerText = "Agendamento atualizado com sucesso!";
-          errorMessage.innerText = "";
-          limparCampos();
-          agendamentoEmEdicao = null; // Limpar a variável de edição
-        });
-      } else {
-        // Se não estivermos editando, adicionamos um novo agendamento
-        const referencia = database.ref('agendamentos');
-        referencia.push(novoAgendamento).then(() => {
-          successMessage.innerText = "Agendamento adicionado com sucesso!";
-          errorMessage.innerText = "";
-          limparCampos();
-        });
+    // Função para confirmar exclusão
+    function confirmarExclusao(id) {
+      const confirmacao = window.confirm("Tem certeza que deseja excluir este agendamento?");
+      if (confirmacao) {
+        excluirAgendamento(id);
       }
     }
 
-    // Limpar os campos do formulário
-    function limparCampos() {
-      document.getElementById('data').value = '';
-      document.getElementById('hora').value = '';
-      document.getElementById('procedimento').value = '';
-      document.getElementById('especialidade').value = '';
-      document.getElementById('local').value = '';
-      document.getElementById('paciente').value = 'Eva';  // ou 'Elza', conforme necessário
+    // Função para excluir agendamento
+    function excluirAgendamento(id) {
+      const agendamentoRef = database.ref('agendamentos/' + id);
+      agendamentoRef.remove()
+        .then(() => {
+          alert("Agendamento excluído com sucesso!");
+        })
+        .catch((error) => {
+          alert("Erro ao excluir o agendamento: " + error.message);
+        });
+    }
+
+    // Função para editar agendamento
+    function editarAgendamento(id) {
+      const agendamentoRef = database.ref('agendamentos/' + id);
+      agendamentoRef.once('value', function(snapshot) {
+        const agendamento = snapshot.val();
+        document.getElementById('data').value = agendamento.data; // Exibir a data como texto (DD/MM/AA)
+        document.getElementById('hora').value = agendamento.hora;
+        document.getElementById('procedimento').value = agendamento.procedimento;
+        document.getElementById('especialidade').value = agendamento.especialidade;
+        document.getElementById('local').value = agendamento.local;
+        document.getElementById('paciente').value = agendamento.paciente;
+        agendamentoEmEdicao = id;
+      });
     }
 
     // Sincronização com Firebase em tempo real
@@ -239,98 +180,16 @@
     agendaRef.on('value', function(snapshot) {
       const agendamentos = snapshot.val();
       const tabela = document.getElementById('agendaTabela');
-      tabela.innerHTML = ''; // Limpar a tabela
+      tabela.innerHTML = '';
 
-      const listaAgendamentos = Object.keys(agendamentos).map(key => {
-        return {
-          id: key,
-          ...agendamentos[key]
-        };
-      });
-
-      listaAgendamentos.sort((a, b) => new Date(a.data) - new Date(b.data));
-
-      listaAgendamentos.forEach(agendamento => {
-        const data = new Date(agendamento.data);
-        const dia = String(data.getDate()).padStart(2, '0');
-        const mes = String(data.getMonth() + 1).padStart(2, '0');
-        const ano = data.getFullYear();
-
-        const dataFormatada = `${dia}/${mes}/${ano}`;
-        
-        const row = tabela.insertRow();
-        row.innerHTML = `
-          <td>${agendamento.paciente}</td>
-          <td>${dataFormatada}</td>
-          <td>${agendamento.hora}</td>
-          <td>${agendamento.procedimento}</td>
-          <td>${agendamento.especialidade}</td>
-          <td>${agendamento.local}</td>
-          <td>
-            <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
-            <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
-          </td>
-        `;
-      });
-    });
-
-    // Editar agendamento
-    function editarAgendamento(id) {
-      const agendamentoRef = database.ref('agendamentos/' + id);
-      agendamentoRef.once('value', function(snapshot) {
-        const agendamento = snapshot.val();
-        // Preencher os campos com as informações do agendamento
-        document.getElementById('data').value = agendamento.data;
-        document.getElementById('hora').value = agendamento.hora;
-        document.getElementById('procedimento').value = agendamento.procedimento;
-        document.getElementById('especialidade').value = agendamento.especialidade;
-        document.getElementById('local').value = agendamento.local;
-        document.getElementById('paciente').value = agendamento.paciente;
-        agendamentoEmEdicao = id;  // Definir a variável de edição
-      });
-    }
-
-    // Confirmar exclusão
-    function confirmarExclusao(key) {
-      const confirmacao = window.confirm("Tem certeza que deseja excluir este agendamento?");
-      if (confirmacao) {
-        excluirAgendamento(key);
-      }
-    }
-
-    // Excluir agendamento
-    function excluirAgendamento(key) {
-      const agendamentoRef = database.ref('agendamentos/' + key);
-      agendamentoRef.remove();
-    }
-
-    // Filtrar agendamentos
-    function filtrarAgendamentos() {
-      const pacienteFiltro = document.getElementById('filtroPaciente').value;
-      const agendamentosRef = database.ref('agendamentos');
-      agendamentosRef.once('value', function(snapshot) {
-        const agendamentos = snapshot.val();
-        const tabela = document.getElementById('agendaTabela');
-        tabela.innerHTML = '';
-
+      if (agendamentos) {
         const listaAgendamentos = Object.keys(agendamentos).map(key => ({
           id: key,
           ...agendamentos[key]
         }));
 
-        const agendamentosFiltrados = listaAgendamentos.filter(agendamento => 
-          pacienteFiltro === "" || agendamento.paciente === pacienteFiltro
-        );
-
-        agendamentosFiltrados.sort((a, b) => new Date(a.data) - new Date(b.data));
-
-        agendamentosFiltrados.forEach(agendamento => {
-          const data = new Date(agendamento.data);
-          const dia = String(data.getDate()).padStart(2, '0');
-          const mes = String(data.getMonth() + 1).padStart(2, '0');
-          const ano = data.getFullYear();
-
-          const dataFormatada = `${dia}/${mes}/${ano}`;
+        listaAgendamentos.forEach(agendamento => {
+          const dataFormatada = agendamento.data; // Mantém a data como foi digitada (DD/MM/AA)
 
           const row = tabela.insertRow();
           row.innerHTML = `
@@ -340,10 +199,74 @@
             <td>${agendamento.procedimento}</td>
             <td>${agendamento.especialidade}</td>
             <td>${agendamento.local}</td>
-            <td><button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button></td>
+            <td>
+              <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
+              <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
+            </td>
           `;
         });
+      } else {
+        console.log("Nenhum agendamento encontrado.");
+      }
+    });
+
+    // Adicionar ou editar agendamento no Firebase
+    let agendamentoEmEdicao = null;
+
+    function adicionarAgendamento() {
+      if (!validarCampos()) return;
+
+      const data = document.getElementById('data').value;
+      const hora = document.getElementById('hora').value;
+      const procedimento = document.getElementById('procedimento').value;
+      const especialidade = document.getElementById('especialidade').value;
+      const local = document.getElementById('local').value;
+      const paciente = document.getElementById('paciente').value;
+      const errorMessage = document.getElementById('errorMessage');
+      const successMessage = document.getElementById('successMessage');
+
+      // Verifica se a data está no formato correto (DD/MM/AA)
+      const regex = /^(\d{2})\/(\d{2})\/(\d{2})$/; // Valida o formato DD/MM/AA
+      const matches = data.match(regex);
+
+      if (!matches) {
+        errorMessage.innerText = "Por favor, insira a data no formato correto (DD/MM/AA).";
+        successMessage.innerText = "";
+        return;
+      }
+
+      // Extraindo dia, mês e ano
+      const dia = matches[1];
+      const mes = matches[2];
+      const ano = "20" + matches[3]; // Adiciona "20" no ano para ser completo, ex: 2025
+
+      const novoAgendamento = {
+        data: data,  // Armazenando a data como string (DD/MM/AA)
+        hora: hora,
+        procedimento: procedimento,
+        especialidade: especialidade,
+        local: local,
+        paciente: paciente,
+        timestamp: new Date().toISOString() // Timestamp completo
+      };
+
+      // Salva o agendamento no Firebase
+      const referencia = database.ref('agendamentos');
+      referencia.push(novoAgendamento).then(() => {
+        successMessage.innerText = "Agendamento adicionado com sucesso!";
+        errorMessage.innerText = "";
+        limparCampos();
       });
+    }
+
+    // Limpar os campos do formulário
+    function limparCampos() {
+      document.getElementById('data').value = '';
+      document.getElementById('hora').value = '';
+      document.getElementById('procedimento').value = '';
+      document.getElementById('especialidade').value = '';
+      document.getElementById('local').value = '';
+      document.getElementById('paciente').value = 'Eva';  // ou 'Elza'
     }
   </script>
 </body>
