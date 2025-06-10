@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Agenda Médica de Eva e Elza</title>
   <style>
     body {
@@ -20,58 +20,45 @@
       font-weight: 700;
     }
 
-    table {
-      width: 100%;
+    .table-container {
       margin-top: 20px;
+    }
+
+    .agendamento-tabela {
+      width: 100%;
+      margin-bottom: 20px;
       border-collapse: collapse;
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
-    th, td {
-      padding: 12px;
-      text-align: left;
+    .agendamento-tabela td {
+      padding: 10px;
       border: 1px solid #ddd;
-      font-size: 1rem;
     }
 
-    th {
-      background-color: #4CAF50;
-      color: white;
-      font-weight: 700;
-    }
-
-    td {
+    .agendamento-tabela tr:nth-child(even) {
       background-color: #f9f9f9;
     }
 
-    tr:hover {
+    .agendamento-tabela tr:hover {
       background-color: #f1f1f1;
     }
 
-    input, select, button {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      width: 100%;
-      margin-bottom: 15px;
+    .agendamento-tabela td strong {
+      color: #4CAF50;
     }
 
-    input[type="text"], input[type="time"], select {
-      max-width: 300px;
-    }
+    /* Responsividade */
+    @media screen and (max-width: 768px) {
+      .agendamento-tabela {
+        font-size: 0.9rem;
+      }
 
-    button {
-      background-color: #4CAF50;
-      color: white;
-      cursor: pointer;
-      border: none;
-    }
-
-    button:hover {
-      background-color: #45a049;
+      .agendamento-tabela td {
+        padding: 8px;
+      }
     }
 
     .form-container {
@@ -86,13 +73,34 @@
       margin-bottom: 8px;
     }
 
-    .form-container input, .form-container select {
+    .form-container input, .form-container select, .form-container button {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      width: 100%;
       margin-bottom: 15px;
     }
 
-    .form-container button {
-      width: 200px;
-      max-width: 100%;
+    .form-container input[type="text"], input[type="time"], select {
+      max-width: 300px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      border: none;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #777;
     }
 
     .error-message, .success-message {
@@ -107,47 +115,11 @@
     .success-message {
       color: green;
     }
-
-    .table-container {
-      margin-top: 20px;
-      overflow-x: auto;
-    }
-
-    .footer {
-      text-align: center;
-      margin-top: 30px;
-      color: #777;
-    }
-
-    /* Responsividade */
-    @media screen and (max-width: 768px) {
-      body {
-        padding: 10px;
-      }
-
-      h1 {
-        font-size: 1.5rem;
-      }
-
-      .form-container input, .form-container select, .form-container button {
-        max-width: 100%;
-      }
-
-      table {
-        width: 100%;
-        margin-top: 20px;
-        font-size: 0.9rem;
-      }
-
-      th, td {
-        padding: 10px;
-      }
-    }
   </style>
 </head>
 <body>
 
-  <h1>Agenda médica de Eva e Elza</h1>
+  <h1>Agenda Médica de Eva e Elza</h1>
 
   <!-- Formulário de Agendamento -->
   <div class="form-container">
@@ -179,22 +151,9 @@
 
   <!-- Tabela de Agendamentos -->
   <div class="table-container">
-    <table>
-      <thead>
-        <tr>
-          <th>Paciente</th>
-          <th>Data</th>
-          <th>Hora</th>
-          <th>Procedimento</th>
-          <th>Especialidade</th>
-          <th>Local</th>
-          <th>Ação</th>
-        </tr>
-      </thead>
-      <tbody id="agendaTabela">
-        <!-- Linhas de agendamentos serão inseridas aqui -->
-      </tbody>
-    </table>
+    <div id="agendaTabela">
+      <!-- Linhas de agendamentos serão inseridas aqui -->
+    </div>
   </div>
 
   <div class="footer">
@@ -276,7 +235,7 @@
     agendaRef.on('value', function(snapshot) {
       const agendamentos = snapshot.val();
       const tabela = document.getElementById('agendaTabela');
-      tabela.innerHTML = '';
+      tabela.innerHTML = '';  // Limpar a tabela antes de exibir os dados
 
       if (agendamentos) {
         const listaAgendamentos = Object.keys(agendamentos).map(key => ({
@@ -285,21 +244,47 @@
         }));
 
         listaAgendamentos.forEach(agendamento => {
-          const dataFormatada = agendamento.data; // Mantém a data como foi digitada (DD/MM/AA)
+          const divAgendamento = document.createElement('div');
+          divAgendamento.classList.add('agendamento');
 
-          const row = tabela.insertRow();
-          row.innerHTML = `
-            <td>${agendamento.paciente}</td>
-            <td>${dataFormatada}</td>
-            <td>${agendamento.hora}</td>
-            <td>${agendamento.procedimento}</td>
-            <td>${agendamento.especialidade}</td>
-            <td>${agendamento.local}</td>
-            <td>
-              <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
-              <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
-            </td>
+          // Criar uma nova tabela para cada agendamento no formato desejado
+          divAgendamento.innerHTML = `
+            <table class="agendamento-tabela">
+              <tr>
+                <td><strong>Paciente</strong></td>
+                <td>${agendamento.paciente}</td>
+              </tr>
+              <tr>
+                <td><strong>Procedimento</strong></td>
+                <td>${agendamento.procedimento}</td>
+              </tr>
+              <tr>
+                <td><strong>Data</strong></td>
+                <td>${agendamento.data}</td>
+              </tr>
+              <tr>
+                <td><strong>Especialidade</strong></td>
+                <td>${agendamento.especialidade}</td>
+              </tr>
+              <tr>
+                <td><strong>Hora</strong></td>
+                <td>${agendamento.hora}</td>
+              </tr>
+              <tr>
+                <td><strong>Local</strong></td>
+                <td>${agendamento.local}</td>
+              </tr>
+              <tr>
+                <td colspan="2">
+                  <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
+                  <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
+                </td>
+              </tr>
+            </table>
           `;
+
+          // Adiciona o agendamento à página
+          tabela.appendChild(divAgendamento);
         });
       } else {
         console.log("Nenhum agendamento encontrado.");
