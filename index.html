@@ -252,7 +252,7 @@
             <p><strong>Local:</strong> ${agendamento.local}</p>
             <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
             <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
-            <button onclick="compartilharNoWhatsApp('${agendamento.id}')">Compartilhar no WhatsApp</button>
+            <button onclick="compartilharImagem('${agendamento.id}')">Compartilhar</button>
           `;
           
           tabela.appendChild(div);
@@ -262,8 +262,8 @@
       }
     });
 
-    // Função para compartilhar o agendamento no WhatsApp
-    function compartilharNoWhatsApp(agendamentoId) {
+    // Função para compartilhar o agendamento como imagem
+    function compartilharImagem(agendamentoId) {
       // Captura o conteúdo do cartão
       const agendamentoCard = document.getElementById(agendamentoId);
       
@@ -273,13 +273,11 @@
           // Converte o canvas para um link de imagem
           const imagem = canvas.toDataURL('image/jpeg');
 
-          // Cria o link do WhatsApp com a imagem gerada
-          const texto = `Confira o agendamento de ${agendamentoCard.querySelector('h3').innerText}: \nData: ${agendamentoCard.querySelector('p strong').innerText} \nClique no link para visualizar: ${imagem}`;
-          
-          const linkWhatsApp = `https://wa.me/?text=${encodeURIComponent(texto)}`;
-
-          // Abre o WhatsApp com o link de compartilhamento
-          window.open(linkWhatsApp, '_blank');
+          // Cria um link para download da imagem
+          const link = document.createElement('a');
+          link.href = imagem;
+          link.download = 'agendamento.jpg'; // Nome do arquivo
+          link.click(); // Simula o clique para download
         }
       });
     }
