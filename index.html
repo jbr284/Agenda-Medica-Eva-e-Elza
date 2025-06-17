@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda Médica de Eva e Elza</title>
   <style>
     body {
@@ -18,47 +18,6 @@
       margin-bottom: 30px;
       font-size: 2rem;
       font-weight: 700;
-    }
-
-    .table-container {
-      margin-top: 20px;
-    }
-
-    .agendamento-tabela {
-      width: 100%;
-      margin-bottom: 20px;
-      border-collapse: collapse;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .agendamento-tabela td {
-      padding: 10px;
-      border: 1px solid #ddd;
-    }
-
-    .agendamento-tabela tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    .agendamento-tabela tr:hover {
-      background-color: #f1f1f1;
-    }
-
-    .agendamento-tabela td strong {
-      color: #4CAF50;
-    }
-
-    /* Responsividade */
-    @media screen and (max-width: 768px) {
-      .agendamento-tabela {
-        font-size: 0.9rem;
-      }
-
-      .agendamento-tabela td {
-        padding: 8px;
-      }
     }
 
     .form-container {
@@ -97,12 +56,6 @@
       background-color: #45a049;
     }
 
-    .footer {
-      text-align: center;
-      margin-top: 30px;
-      color: #777;
-    }
-
     .error-message, .success-message {
       font-size: 1rem;
       text-align: center;
@@ -114,6 +67,47 @@
 
     .success-message {
       color: green;
+    }
+
+    .agendamento-card {
+      background-color: #fff;
+      padding: 20px;
+      margin: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 350px;
+      box-sizing: border-box;
+      margin-bottom: 20px;
+    }
+
+    .agendamento-card h3 {
+      color: #333;
+    }
+
+    .agendamento-card p {
+      font-size: 1rem;
+      color: #555;
+    }
+
+    .agendamento-card button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .agendamento-card button:hover {
+      background-color: #45a049;
+    }
+
+    /* Responsividade */
+    @media (max-width: 768px) {
+      .agendamento-card {
+        max-width: 90%;
+      }
     }
   </style>
 </head>
@@ -144,16 +138,14 @@
       <option value="Elza">Elza</option>
     </select>
 
-    <button onclick="adicionarAgendamento()">Adicionar Agendamento</button>
+    <button type="button" onclick="adicionarAgendamento()">Adicionar Agendamento</button>
     <p id="errorMessage" class="error-message"></p> <!-- Mensagem de erro aqui -->
     <p id="successMessage" class="success-message"></p> <!-- Mensagem de sucesso aqui -->
   </div>
 
-  <!-- Tabela de Agendamentos -->
-  <div class="table-container">
-    <div id="agendaTabela">
-      <!-- Linhas de agendamentos serão inseridas aqui -->
-    </div>
+  <!-- Exibir os Agendamentos -->
+  <div id="agendaTabela">
+    <!-- Os agendamentos serão exibidos como cartões aqui -->
   </div>
 
   <div class="footer">
@@ -163,6 +155,7 @@
   <!-- Firebase Script (Versão não modular) -->
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
   <script>
     // Configuração do Firebase
     const firebaseConfig = {
@@ -235,7 +228,7 @@
     agendaRef.on('value', function(snapshot) {
       const agendamentos = snapshot.val();
       const tabela = document.getElementById('agendaTabela');
-      tabela.innerHTML = '';  // Limpar a tabela antes de exibir os dados
+      tabela.innerHTML = '';
 
       if (agendamentos) {
         const listaAgendamentos = Object.keys(agendamentos).map(key => ({
@@ -244,52 +237,50 @@
         }));
 
         listaAgendamentos.forEach(agendamento => {
-          const divAgendamento = document.createElement('div');
-          divAgendamento.classList.add('agendamento');
+          const dataFormatada = agendamento.data; // Mantém a data como foi digitada (DD/MM/AA)
 
-          // Criar uma nova tabela para cada agendamento no formato desejado
-          divAgendamento.innerHTML = `
-            <table class="agendamento-tabela">
-              <tr>
-                <td><strong>Paciente</strong></td>
-                <td>${agendamento.paciente}</td>
-              </tr>
-              <tr>
-                <td><strong>Procedimento</strong></td>
-                <td>${agendamento.procedimento}</td>
-              </tr>
-              <tr>
-                <td><strong>Data</strong></td>
-                <td>${agendamento.data}</td>
-              </tr>
-              <tr>
-                <td><strong>Especialidade</strong></td>
-                <td>${agendamento.especialidade}</td>
-              </tr>
-              <tr>
-                <td><strong>Hora</strong></td>
-                <td>${agendamento.hora}</td>
-              </tr>
-              <tr>
-                <td><strong>Local</strong></td>
-                <td>${agendamento.local}</td>
-              </tr>
-              <tr>
-                <td colspan="2">
-                  <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
-                  <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
-                </td>
-              </tr>
-            </table>
+          const div = document.createElement('div');
+          div.className = 'agendamento-card';
+          div.id = agendamento.id;
+          
+          div.innerHTML = `
+            <h3>Paciente: ${agendamento.paciente}</h3>
+            <p><strong>Data:</strong> ${dataFormatada}</p>
+            <p><strong>Hora:</strong> ${agendamento.hora}</p>
+            <p><strong>Procedimento:</strong> ${agendamento.procedimento}</p>
+            <p><strong>Especialidade:</strong> ${agendamento.especialidade}</p>
+            <p><strong>Local:</strong> ${agendamento.local}</p>
+            <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
+            <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
+            <button onclick="compartilharImagem('${agendamento.id}')">Compartilhar</button>
           `;
-
-          // Adiciona o agendamento à página
-          tabela.appendChild(divAgendamento);
+          
+          tabela.appendChild(div);
         });
       } else {
         console.log("Nenhum agendamento encontrado.");
       }
     });
+
+    // Função para compartilhar o agendamento como imagem
+    function compartilharImagem(agendamentoId) {
+      // Captura o conteúdo do cartão
+      const agendamentoCard = document.getElementById(agendamentoId);
+      
+      // Usa o html2canvas para gerar a imagem do conteúdo
+      html2canvas(agendamentoCard, {
+        onrendered: function(canvas) {
+          // Converte o canvas para um link de imagem
+          const imagem = canvas.toDataURL('image/jpeg');
+
+          // Cria um link para download da imagem
+          const link = document.createElement('a');
+          link.href = imagem;
+          link.download = 'agendamento.jpg'; // Nome do arquivo
+          link.click(); // Simula o clique para download
+        }
+      });
+    }
 
     // Adicionar ou editar agendamento no Firebase
     let agendamentoEmEdicao = null;
@@ -303,23 +294,6 @@
       const especialidade = document.getElementById('especialidade').value;
       const local = document.getElementById('local').value;
       const paciente = document.getElementById('paciente').value;
-      const errorMessage = document.getElementById('errorMessage');
-      const successMessage = document.getElementById('successMessage');
-
-      // Verifica se a data está no formato correto (DD/MM/AA)
-      const regex = /^(\d{2})\/(\d{2})\/(\d{2})$/; // Valida o formato DD/MM/AA
-      const matches = data.match(regex);
-
-      if (!matches) {
-        errorMessage.innerText = "Por favor, insira a data no formato correto (DD/MM/AA).";
-        successMessage.innerText = "";
-        return;
-      }
-
-      // Extraindo dia, mês e ano
-      const dia = matches[1];
-      const mes = matches[2];
-      const ano = "20" + matches[3]; // Adiciona "20" no ano para ser completo, ex: 2025
 
       const novoAgendamento = {
         data: data,  // Armazenando a data como string (DD/MM/AA)
@@ -334,8 +308,7 @@
       // Salva o agendamento no Firebase
       const referencia = database.ref('agendamentos');
       referencia.push(novoAgendamento).then(() => {
-        successMessage.innerText = "Agendamento adicionado com sucesso!";
-        errorMessage.innerText = "";
+        alert("Agendamento adicionado com sucesso!");
         limparCampos();
       });
     }
