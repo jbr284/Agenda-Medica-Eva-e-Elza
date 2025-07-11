@@ -110,6 +110,10 @@
       }
     }
   </style>
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#007acc">
+<link rel="icon" href="icon-192x192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icon-512x512.png">
 </head>
 <body>
 
@@ -322,6 +326,8 @@
       document.getElementById('local').value = '';
       document.getElementById('paciente').value = 'Eva';  // ou 'Elza'
     }
+    if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
   </script>
 </body>
 </html>
