@@ -1,12 +1,10 @@
-
 {
-  "name": "Agenda Médica",
-  "short_name": "Agenda",
-  "description": "Sistema de agendamento de consultas médicas",
-  "start_url": "./",
+  "name": "Agenda Médica Eva e Elza",
+  "short_name": "Agenda Médica",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#4CAF50",
+  "theme_color": "#007acc",
   "icons": [
     {
       "src": "icon-192x192.png",
