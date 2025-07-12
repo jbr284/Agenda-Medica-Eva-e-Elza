@@ -110,10 +110,6 @@
       }
     }
   </style>
-  <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#007acc">
-<link rel="icon" href="icon-192x192.png" sizes="192x192" type="image/png">
-<link rel="apple-touch-icon" href="icon-512x512.png">
 </head>
 <body>
 
@@ -229,12 +225,7 @@
 
     // Sincronização com Firebase em tempo real
     const agendaRef = database.ref('agendamentos');
-    let dataFormatada = agendamento.data;
-if (dataFormatada.includes('-')) {
-  const [ano, mes, dia] = dataFormatada.split('-');
-  dataFormatada = `${dia}/${mes}/${ano}`;
-}
- {
+    agendaRef.on('value', function(snapshot) {
       const agendamentos = snapshot.val();
       const tabela = document.getElementById('agendaTabela');
       tabela.innerHTML = '';
@@ -246,7 +237,11 @@ if (dataFormatada.includes('-')) {
         }));
 
         listaAgendamentos.forEach(agendamento => {
-          const dataFormatada = agendamento.data; // Mantém a data como foi digitada (DD/MM/AA)
+          let dataFormatada = agendamento.data;
+if (dataFormatada.includes('-')) {
+  const [ano, mes, dia] = dataFormatada.split('-');
+  dataFormatada = `${dia}/${mes}/${ano}`;
+}
 
           const div = document.createElement('div');
           div.className = 'agendamento-card';
@@ -331,10 +326,7 @@ if (dataFormatada.includes('-')) {
       document.getElementById('local').value = '';
       document.getElementById('paciente').value = 'Eva';  // ou 'Elza'
     }
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('service-worker.js');
-  }
-    // Ao carregar a página, define a data de hoje no input (formato AAAA-MM-DD)
+// Ao carregar a página, define a data de hoje no input (formato AAAA-MM-DD)
 window.addEventListener('DOMContentLoaded', () => {
   const hoje = new Date();
   const yyyy = hoje.getFullYear();
@@ -342,6 +334,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const dd = String(hoje.getDate()).padStart(2, '0');
   document.getElementById('data').value = `${yyyy}-${mm}-${dd}`;
 });
+
   </script>
 </body>
 </html>
