@@ -121,8 +121,8 @@
 
   <!-- Formulário de Agendamento -->
   <div class="form-container">
-    <label for="data">Data (DD/MM/AA):</label>
-    <input type="text" id="data" name="data" placeholder="Digite a data (DD/MM/AA)">
+<label for="data">Data:</label>
+<input type="date" id="data" name="data">
     
     <label for="hora">Hora:</label>
     <input type="time" id="hora" name="hora">
@@ -229,7 +229,12 @@
 
     // Sincronização com Firebase em tempo real
     const agendaRef = database.ref('agendamentos');
-    agendaRef.on('value', function(snapshot) {
+    let dataFormatada = agendamento.data;
+if (dataFormatada.includes('-')) {
+  const [ano, mes, dia] = dataFormatada.split('-');
+  dataFormatada = `${dia}/${mes}/${ano}`;
+}
+ {
       const agendamentos = snapshot.val();
       const tabela = document.getElementById('agendaTabela');
       tabela.innerHTML = '';
@@ -329,6 +334,14 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('service-worker.js');
   }
+    // Ao carregar a página, define a data de hoje no input (formato AAAA-MM-DD)
+window.addEventListener('DOMContentLoaded', () => {
+  const hoje = new Date();
+  const yyyy = hoje.getFullYear();
+  const mm = String(hoje.getMonth() + 1).padStart(2, '0');
+  const dd = String(hoje.getDate()).padStart(2, '0');
+  document.getElementById('data').value = `${yyyy}-${mm}-${dd}`;
+});
   </script>
 </body>
 </html>
