@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda Médica de Eva e Elza</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  
   <style>
     body {
       font-family: 'Arial', sans-serif;
@@ -30,6 +32,7 @@
     .form-container label {
       font-weight: 600;
       margin-bottom: 8px;
+      margin-top: 15px;
     }
 
     .form-container input, .form-container select, .form-container button {
@@ -41,7 +44,7 @@
       margin-bottom: 15px;
     }
 
-    .form-container input[type="text"], input[type="time"], input[type="date"], select {
+    .form-container input[type="text"], select {
       max-width: 300px;
     }
 
@@ -56,23 +59,10 @@
       background-color: #45a049;
     }
 
-    .error-message, .success-message {
-      font-size: 1rem;
-      text-align: center;
-    }
-
-    .error-message {
-      color: red;
-    }
-
-    .success-message {
-      color: green;
-    }
-
     .agendamento-card {
       background-color: #fff;
       padding: 20px;
-      margin: 10px;
+      margin: 10px auto;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       width: 100%;
@@ -81,15 +71,8 @@
       margin-bottom: 20px;
     }
 
-    .agendamento-card h3 {
-      color: #333;
-    }
-
-    .agendamento-card p {
-      font-size: 1rem;
-      color: #555;
-    }
-
+    .agendamento-card h3 { color: #333; }
+    .agendamento-card p { font-size: 1rem; color: #555; }
     .agendamento-card button {
       background-color: #4CAF50;
       color: white;
@@ -97,55 +80,102 @@
       padding: 10px;
       border-radius: 5px;
       cursor: pointer;
+      margin-right: 5px;
+    }
+    .agendamento-card button:hover { background-color: #45a049; }
+
+    /* Estilos das Abas */
+    .tabs-navigation { text-align: center; margin-bottom: 25px; border-bottom: 1px solid #ddd; }
+    .tab-link {
+      background-color: transparent;
+      border: none;
+      padding: 15px 20px;
+      cursor: pointer;
+      font-size: 1.1rem;
+      color: #555;
+      margin: 0 5px;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s ease-in-out;
+    }
+    .tab-link.active {
+      font-weight: bold;
+      color: #007acc;
+      border-bottom: 3px solid #007acc;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* === NOVOS ESTILOS PARA O CALENDÁRIO/RELÓGIO INLINE === */
+    .seletor-container {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
     }
 
-    .agendamento-card button:hover {
-      background-color: #45a049;
+    #calendario-inline, #relogio-inline {
+      flex-shrink: 0;
     }
 
     @media (max-width: 768px) {
+      .seletor-container {
+        flex-direction: column;
+        align-items: center;
+      }
       .agendamento-card {
         max-width: 90%;
       }
     }
   </style>
   <link rel="manifest" href="manifest.json" />
-<link rel="icon" href="icon-192x192.png" sizes="192x192" type="image/png" />
-<link rel="apple-touch-icon" href="icon-512x512.png" />
-<meta name="theme-color" content="#007acc" />
+  <link rel="icon" href="icon-192x192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="icon-512x512.png" />
+  <meta name="theme-color" content="#007acc" />
 </head>
 <body>
 
   <h1>Agenda Médica de Eva e Elza</h1>
 
-  <div class="form-container">
-    <label for="data">Data:</label>
-    <input type="date" id="data" name="data">
-
-    <label for="hora">Hora:</label>
-    <input type="time" id="hora" name="hora">
-
-    <label for="procedimento">Procedimento:</label>
-    <input type="text" id="procedimento" name="procedimento">
-
-    <label for="especialidade">Especialidade:</label>
-    <input type="text" id="especialidade" name="especialidade">
-
-    <label for="local">Local:</label>
-    <input type="text" id="local" name="local">
-
-    <label for="paciente">Paciente:</label>
-    <select id="paciente" name="paciente">
-      <option value="Eva">Eva</option>
-      <option value="Elza">Elza</option>
-    </select>
-
-    <button type="button" onclick="adicionarAgendamento()">Adicionar Agendamento</button>
-    <p id="errorMessage" class="error-message"></p>
-    <p id="successMessage" class="success-message"></p>
+  <div class="tabs-navigation">
+    <button id="btn-tab-lista" class="tab-link" onclick="mostrarAba('lista')">Próximas Consultas</button>
+    <button id="btn-tab-cadastro" class="tab-link" onclick="mostrarAba('cadastro')">Novo Agendamento</button>
   </div>
 
-  <div id="agendaTabela"></div>
+  <div id="conteudo-abas">
+    <div id="tab-cadastro" class="tab-content">
+      <div class="form-container">
+
+        <div class="seletor-container">
+          <div id="calendario-inline"></div>
+          <div id="relogio-inline"></div>
+        </div>
+        <input type="hidden" id="data-selecionada">
+        <input type="hidden" id="hora-selecionada">
+        <label for="procedimento">Procedimento:</label>
+        <input type="text" id="procedimento" name="procedimento">
+
+        <label for="especialidade">Especialidade:</label>
+        <input type="text" id="especialidade" name="especialidade">
+
+        <label for="local">Local:</label>
+        <input type="text" id="local" name="local">
+
+        <label for="paciente">Paciente:</label>
+        <select id="paciente" name="paciente">
+          <option value="Eva">Eva</option>
+          <option value="Elza">Elza</option>
+        </select>
+
+        <button type="button" onclick="adicionarAgendamento()">Salvar Agendamento</button>
+      </div>
+    </div>
+
+    <div id="tab-lista" class="tab-content">
+      <div id="agendaTabela"></div>
+    </div>
+  </div>
 
   <div class="footer">
     <p>&copy; 2025 Agenda Médica de Eva e Elza</p>
@@ -154,6 +184,9 @@
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
+
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyA_mJkkpL87mTlRkbPRxHuxObPE1PqqlgE",
@@ -169,31 +202,33 @@
     const database = firebase.database();
 
     let agendamentoEmEdicao = null;
+    let calendarInstance, timeInstance; // Variáveis para guardar as instâncias do flatpickr
 
-    function validarCampos() {
-      const data = document.getElementById('data').value;
-      const hora = document.getElementById('hora').value;
-      const procedimento = document.getElementById('procedimento').value;
-      const especialidade = document.getElementById('especialidade').value;
-      const local = document.getElementById('local').value;
-      const paciente = document.getElementById('paciente').value;
-      return data && hora && procedimento && especialidade && local && paciente;
+    function mostrarAba(nomeAba) {
+      document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('active'));
+      document.querySelectorAll('.tab-link').forEach(btn => btn.classList.remove('active'));
+      
+      document.getElementById(`tab-${nomeAba}`).classList.add('active');
+      document.getElementById(`btn-tab-${nomeAba}`).classList.add('active');
     }
 
     function adicionarAgendamento() {
-      if (!validarCampos()) return alert("Por favor, preencha todos os campos.");
-
-      const dataISO = document.getElementById('data').value;
-      const [ano, mes, dia] = dataISO.split("-");
-      const data = `${dia}/${mes}/${ano}`;
-      const hora = document.getElementById('hora').value;
+      const data = document.getElementById('data-selecionada').value;
+      const hora = document.getElementById('hora-selecionada').value;
       const procedimento = document.getElementById('procedimento').value;
       const especialidade = document.getElementById('especialidade').value;
       const local = document.getElementById('local').value;
       const paciente = document.getElementById('paciente').value;
+      
+      if (!data || !hora || !procedimento || !especialidade || !local || !paciente) {
+        return alert("Por favor, preencha todos os campos, incluindo data e hora.");
+      }
+
+      const [ano, mes, dia] = data.split("-");
+      const dataFormatada = `${dia}/${mes}/${ano}`;
 
       const novoAgendamento = {
-        data,
+        data: dataFormatada,
         hora,
         procedimento,
         especialidade,
@@ -208,22 +243,22 @@
 
       referencia.set(novoAgendamento).then(() => {
         alert(agendamentoEmEdicao ? "Agendamento atualizado com sucesso!" : "Agendamento adicionado com sucesso!");
-        agendamentoEmEdicao = null;
         limparCampos();
+        mostrarAba('lista');
       }).catch(error => alert("Erro ao salvar: " + error.message));
     }
 
     function limparCampos() {
-      const hoje = new Date();
-      const yyyy = hoje.getFullYear();
-      const mm = String(hoje.getMonth() + 1).padStart(2, '0');
-      const dd = String(hoje.getDate()).padStart(2, '0');
-      document.getElementById('data').value = `${yyyy}-${mm}-${dd}`;
-      document.getElementById('hora').value = '';
+      if (calendarInstance) calendarInstance.clear();
+      if (timeInstance) timeInstance.clear();
+      
+      document.getElementById('data-selecionada').value = '';
+      document.getElementById('hora-selecionada').value = '';
       document.getElementById('procedimento').value = '';
       document.getElementById('especialidade').value = '';
       document.getElementById('local').value = '';
       document.getElementById('paciente').value = 'Eva';
+      agendamentoEmEdicao = null;
     }
 
     function confirmarExclusao(id) {
@@ -237,14 +272,24 @@
     function editarAgendamento(id) {
       database.ref('agendamentos/' + id).once('value', snapshot => {
         const agendamento = snapshot.val();
+        
+        // Converte a data de DD/MM/AAAA para AAAA-MM-DD para o flatpickr
         const [dia, mes, ano] = agendamento.data.split("/");
-        document.getElementById('data').value = `${ano}-${mes}-${dia}`;
-        document.getElementById('hora').value = agendamento.hora;
+        const dataParaFlatpickr = `${ano}-${mes}-${dia}`;
+        
+        // Define a data e a hora nas instâncias do flatpickr
+        if (calendarInstance) calendarInstance.setDate(dataParaFlatpickr, true);
+        if (timeInstance) timeInstance.setDate(agendamento.hora, true);
+        
+        // Preenche o resto dos campos
         document.getElementById('procedimento').value = agendamento.procedimento;
         document.getElementById('especialidade').value = agendamento.especialidade;
         document.getElementById('local').value = agendamento.local;
         document.getElementById('paciente').value = agendamento.paciente;
         agendamentoEmEdicao = id;
+        
+        mostrarAba('cadastro');
+        window.scrollTo(0, 0);
       });
     }
 
@@ -253,45 +298,31 @@
       const agendamentos = snapshot.val();
       const tabela = document.getElementById('agendaTabela');
       tabela.innerHTML = '';
+      if (!agendamentos) return;
 
-     if (agendamentos) {
-  const listaAgendamentos = Object.keys(agendamentos).map(id => {
-    const dados = agendamentos[id];
-    let dataComparavel = dados.data;
-    if (dataComparavel.includes('/')) {
-      const [dia, mes, ano] = dataComparavel.split('/');
-      dataComparavel = `${ano}-${mes}-${dia}`;
-    } else if (dataComparavel.includes('-')) {
-      const [ano, mes, dia] = dataComparavel.split('-');
-      dataComparavel = `${ano}-${mes}-${dia}`;
-    }
-    return { id, ...dados, dataComparavel };
-  }).sort((a, b) => a.dataComparavel.localeCompare(b.dataComparavel));
-
-  listaAgendamentos.forEach(agendamento => {
-    let dataFormatada = agendamento.data;
-    if (dataFormatada.includes('-')) {
-      const [ano, mes, dia] = dataFormatada.split('-');
-      dataFormatada = `${dia}/${mes}/${ano}`;
-    }
-
-    const div = document.createElement('div');
-    div.className = 'agendamento-card';
-    div.id = agendamento.id;
-    div.innerHTML = `
-      <h3>Paciente: ${agendamento.paciente}</h3>
-      <p><strong>Data:</strong> ${dataFormatada}</p>
-      <p><strong>Hora:</strong> ${agendamento.hora}</p>
-      <p><strong>Procedimento:</strong> ${agendamento.procedimento}</p>
-      <p><strong>Especialidade:</strong> ${agendamento.especialidade}</p>
-      <p><strong>Local:</strong> ${agendamento.local}</p>
-      <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
-      <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
-      <button onclick="compartilharImagem('${agendamento.id}')">Compartilhar</button>
-    `;
-    tabela.appendChild(div);
-  });
-      }
+      Object.keys(agendamentos)
+        .map(id => ({ id, ...agendamentos[id] }))
+        .sort((a, b) => {
+            const [diaA, mesA, anoA] = a.data.split('/');
+            const [diaB, mesB, anoB] = b.data.split('/');
+            return new Date(`${anoA}-${mesA}-${diaA}T${a.hora}`) - new Date(`${anoB}-${mesB}-${diaB}T${b.hora}`);
+        })
+        .forEach(agendamento => {
+          const div = document.createElement('div');
+          div.className = 'agendamento-card';
+          div.id = agendamento.id;
+          div.innerHTML = `
+            <h3>Paciente: ${agendamento.paciente}</h3>
+            <p><strong>Data:</strong> ${agendamento.data}</p>
+            <p><strong>Hora:</strong> ${agendamento.hora}</p>
+            <p><strong>Procedimento:</strong> ${agendamento.procedimento}</p>
+            <p><strong>Especialidade:</strong> ${agendamento.especialidade}</p>
+            <p><strong>Local:</strong> ${agendamento.local}</p>
+            <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
+            <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
+            <button onclick="compartilharImagem('${agendamento.id}')">Compartilhar</button>`;
+          tabela.appendChild(div);
+        });
     });
 
     function compartilharImagem(agendamentoId) {
@@ -308,15 +339,33 @@
     }
 
     window.addEventListener('DOMContentLoaded', () => {
-      const hoje = new Date();
-      const yyyy = hoje.getFullYear();
-      const mm = String(hoje.getMonth() + 1).padStart(2, '0');
-      const dd = String(hoje.getDate()).padStart(2, '0');
-      document.getElementById('data').value = `${yyyy}-${mm}-${dd}`;
+      flatpickr.localize(flatpickr.l10ns.pt);
+
+      calendarInstance = flatpickr("#calendario-inline", {
+        inline: true,
+        dateFormat: "Y-m-d",
+        onChange: (selectedDates, dateStr) => {
+          document.getElementById('data-selecionada').value = dateStr;
+        }
+      });
+
+      timeInstance = flatpickr("#relogio-inline", {
+        inline: true,
+        enableTime: true,
+        noCalendar: true,
+        dateFormat: "H:i",
+        time_24hr: true,
+        onChange: (selectedDates, dateStr) => {
+          document.getElementById('hora-selecionada').value = dateStr;
+        }
+      });
+
+      mostrarAba('lista');
     });
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js');
+    }
   </script>
 </body>
 </html>
