@@ -105,13 +105,12 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* === NOVOS ESTILOS PARA O CALENDÁRIO/RELÓGIO INLINE === */
+    /* === ESTILOS ATUALIZADOS PARA O CALENDÁRIO/RELÓGIO INLINE === */
     .seletor-container {
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      gap: 20px;
-      flex-wrap: wrap;
+      flex-direction: column; /* Itens empilhados verticalmente */
+      align-items: center;   /* Itens centralizados */
+      gap: 20px;             /* Espaço entre o calendário e o relógio */
       margin-bottom: 20px;
     }
 
@@ -120,10 +119,6 @@
     }
 
     @media (max-width: 768px) {
-      .seletor-container {
-        flex-direction: column;
-        align-items: center;
-      }
       .agendamento-card {
         max-width: 90%;
       }
@@ -202,7 +197,7 @@
     const database = firebase.database();
 
     let agendamentoEmEdicao = null;
-    let calendarInstance, timeInstance; // Variáveis para guardar as instâncias do flatpickr
+    let calendarInstance, timeInstance;
 
     function mostrarAba(nomeAba) {
       document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('active'));
@@ -250,7 +245,10 @@
 
     function limparCampos() {
       if (calendarInstance) calendarInstance.clear();
-      if (timeInstance) timeInstance.clear();
+      if (timeInstance) {
+        timeInstance.clear();
+        timeInstance.setDate(new Date()); // Reseta o relógio para a hora atual
+      }
       
       document.getElementById('data-selecionada').value = '';
       document.getElementById('hora-selecionada').value = '';
@@ -273,15 +271,12 @@
       database.ref('agendamentos/' + id).once('value', snapshot => {
         const agendamento = snapshot.val();
         
-        // Converte a data de DD/MM/AAAA para AAAA-MM-DD para o flatpickr
         const [dia, mes, ano] = agendamento.data.split("/");
         const dataParaFlatpickr = `${ano}-${mes}-${dia}`;
         
-        // Define a data e a hora nas instâncias do flatpickr
         if (calendarInstance) calendarInstance.setDate(dataParaFlatpickr, true);
         if (timeInstance) timeInstance.setDate(agendamento.hora, true);
         
-        // Preenche o resto dos campos
         document.getElementById('procedimento').value = agendamento.procedimento;
         document.getElementById('especialidade').value = agendamento.especialidade;
         document.getElementById('local').value = agendamento.local;
@@ -305,7 +300,9 @@
         .sort((a, b) => {
             const [diaA, mesA, anoA] = a.data.split('/');
             const [diaB, mesB, anoB] = b.data.split('/');
-            return new Date(`${anoA}-${mesA}-${diaA}T${a.hora}`) - new Date(`${anoB}-${mesB}-${diaB}T${b.hora}`);
+            const dataA = new Date(`${anoA}-${mesA}-${diaA}T${a.hora || '00:00'}`);
+            const dataB = new Date(`${anoB}-${mesB}-${diaB}T${b.hora || '00:00'}`);
+            return dataA - dataB;
         })
         .forEach(agendamento => {
           const div = document.createElement('div');
@@ -355,10 +352,17 @@
         noCalendar: true,
         dateFormat: "H:i",
         time_24hr: true,
+        defaultDate: new Date(), // Define a hora inicial para a hora atual
         onChange: (selectedDates, dateStr) => {
           document.getElementById('hora-selecionada').value = dateStr;
         }
       });
+      
+      // Define o valor inicial da hora no input escondido
+      const agora = new Date();
+      const horas = String(agora.getHours()).padStart(2, '0');
+      const minutos = String(agora.getMinutes()).padStart(2, '0');
+      document.getElementById('hora-selecionada').value = `${horas}:${minutos}`;
 
       mostrarAba('lista');
     });
