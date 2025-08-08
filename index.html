@@ -4,124 +4,207 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda Médica de Eva e Elza</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   
   <style>
-    body {
-      font-family: 'Arial', sans-serif;
+    /* === VARIÁVEIS DE COR E CONFIGURAÇÕES GLOBAIS === */
+    :root {
+      --primary-color: #007acc;
+      --secondary-color: #5a67d8;
+      --danger-color: #e53e3e;
+      --light-gray: #f7fafc;
+      --gray-text: #4a5568;
+      --dark-text: #2d3748;
+      --border-color: #e2e8f0;
+      --shadow-color: rgba(0, 0, 0, 0.1);
+    }
+
+    * {
       margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: var(--light-gray);
+      color: var(--gray-text);
       padding: 20px;
-      background-color: #f9f9f9;
+    }
+    
+    /* === CONTAINER PRINCIPAL DA APLICAÇÃO === */
+    .main-container {
+        max-width: 900px;
+        margin: 20px auto;
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px var(--shadow-color);
+        padding: 2rem;
+        border: 1px solid var(--border-color);
     }
 
     h1 {
       text-align: center;
-      color: #333;
-      margin-bottom: 30px;
-      font-size: 2rem;
+      color: var(--dark-text);
+      margin-bottom: 2rem;
+      font-size: 2.25rem;
       font-weight: 700;
     }
-
-    .form-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin-bottom: 30px;
+    
+    /* === HIERARQUIA DE BOTÕES (BASE) === */
+    .btn {
+        font-family: 'Roboto', sans-serif;
+        font-size: 1rem;
+        font-weight: 700;
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: 2px solid transparent;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
     }
-
-    .form-container label {
-      font-weight: 600;
-      margin-bottom: 8px;
-      margin-top: 15px;
+    
+    /* === ESTILOS DAS ABAS (AGORA COMO BOTÕES) === */
+    .tabs-navigation {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        border-bottom: none; 
+        margin-bottom: 2rem;
     }
-
-    .form-container input, .form-container select, .form-container button {
-      padding: 10px;
-      font-size: 1rem;
-      border-radius: 4px;
-      border: 1px solid #ddd;
-      width: 100%;
-      margin-bottom: 15px;
-    }
-
-    .form-container input[type="text"], select {
-      max-width: 300px;
-    }
-
-    button {
-      background-color: #4CAF50;
-      color: white;
-      cursor: pointer;
-      border: none;
-    }
-
-    button:hover {
-      background-color: #45a049;
-    }
-
-    .agendamento-card {
-      background-color: #fff;
-      padding: 20px;
-      margin: 10px auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 350px;
-      box-sizing: border-box;
-      margin-bottom: 20px;
-    }
-
-    .agendamento-card h3 { color: #333; }
-    .agendamento-card p { font-size: 1rem; color: #555; }
-    .agendamento-card button {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      margin-right: 5px;
-    }
-    .agendamento-card button:hover { background-color: #45a049; }
-
-    /* Estilos das Abas */
-    .tabs-navigation { text-align: center; margin-bottom: 25px; border-bottom: 1px solid #ddd; }
     .tab-link {
-      background-color: transparent;
-      border: none;
-      padding: 15px 20px;
-      cursor: pointer;
-      font-size: 1.1rem;
-      color: #555;
-      margin: 0 5px;
-      border-bottom: 3px solid transparent;
-      transition: all 0.2s ease-in-out;
+        background-color: transparent;
+        border-color: var(--border-color);
+        color: var(--gray-text);
+        font-weight: 500;
+        padding: 10px 20px;
+    }
+    .tab-link:hover {
+        border-color: var(--primary-color);
+        color: var(--primary-color);
     }
     .tab-link.active {
-      font-weight: bold;
-      color: #007acc;
-      border-bottom: 3px solid #007acc;
+        background-color: var(--primary-color);
+        border-color: var(--primary-color);
+        color: white;
+        font-weight: 700;
     }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* === ESTILOS ATUALIZADOS PARA O CALENDÁRIO/RELÓGIO INLINE === */
+    /* === FORMULÁRIO E SELETORES === */
+    .form-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .form-container label {
+      font-weight: 500;
+      margin-bottom: 8px;
+      margin-top: 1.5rem;
+      color: var(--dark-text);
+    }
+    .form-container input[type="text"], .form-container select {
+      padding: 12px;
+      font-size: 1rem;
+      border-radius: 6px;
+      border: 1px solid var(--border-color);
+      width: 100%;
+      max-width: 400px;
+    }
     .seletor-container {
       display: flex;
-      flex-direction: column; /* Itens empilhados verticalmente */
-      align-items: center;   /* Itens centralizados */
-      gap: 20px;             /* Espaço entre o calendário e o relógio */
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
       margin-bottom: 20px;
+      width: 100%;
     }
+    
+    /* === BOTÕES DE AÇÃO ESPECÍFICOS === */
+    .btn-primary {
+        background-color: var(--primary-color);
+        color: white;
+        margin-top: 2rem;
+        width: 100%;
+        max-width: 400px;
+    }
+    .btn-primary:hover {
+        filter: brightness(1.1);
+        box-shadow: 0 4px 8px rgba(0, 122, 204, 0.3);
+    }
+    .btn-secondary {
+        background-color: var(--secondary-color);
+        color: white;
+        padding: 8px 16px;
+        font-size: 0.875rem;
+    }
+    .btn-secondary:hover { filter: brightness(1.1); }
+    .btn-danger {
+        background-color: transparent;
+        color: var(--danger-color);
+        border: 2px solid var(--danger-color);
+        padding: 6px 14px;
+        font-size: 0.875rem;
+    }
+    .btn-danger:hover { background-color: var(--danger-color); color: white; }
+    .btn-default {
+        background-color: #A0AEC0;
+        color: white;
+        padding: 8px 16px;
+        font-size: 0.875rem;
+    }
+    .btn-default:hover { filter: brightness(1.1); }
 
-    #calendario-inline, #relogio-inline {
-      flex-shrink: 0;
+    /* === CARDS DE AGENDAMENTO === */
+    .agendamento-card {
+      background-color: #fff;
+      padding: 0;
+      margin: 1rem auto;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 4px var(--shadow-color);
+      width: 100%;
+      max-width: 450px;
+      overflow: hidden;
+    }
+    .card-header {
+        background-color: var(--light-gray);
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+    }
+    .card-header h3 {
+        color: var(--dark-text);
+        font-size: 1.25rem;
+    }
+    .card-body {
+        padding: 1rem;
+    }
+    .card-body p {
+        font-size: 1rem;
+        color: var(--gray-text);
+        margin-bottom: 0.5rem;
+    }
+    .card-footer {
+        padding: 1rem;
+        border-top: 1px solid var(--border-color);
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
     }
 
     @media (max-width: 768px) {
-      .agendamento-card {
-        max-width: 90%;
+      .main-container {
+          padding: 1rem;
+          margin: 10px;
       }
+      h1 { font-size: 1.75rem; }
+      .tabs-navigation { flex-wrap: wrap; }
     }
   </style>
   <link rel="manifest" href="manifest.json" />
@@ -131,31 +214,33 @@
 </head>
 <body>
 
-  <h1>Agenda Médica de Eva e Elza</h1>
+<div class="main-container">
+
+  <h1>Agenda Médica - Eva e Elza</h1>
 
   <div class="tabs-navigation">
-    <button id="btn-tab-lista" class="tab-link" onclick="mostrarAba('lista')">Próximas Consultas</button>
-    <button id="btn-tab-cadastro" class="tab-link" onclick="mostrarAba('cadastro')">Novo Agendamento</button>
+    <button id="btn-tab-lista" class="btn tab-link" onclick="mostrarAba('lista')">Consultas Agendadas</button>
+    <button id="btn-tab-cadastro" class="btn tab-link" onclick="mostrarAba('cadastro')">Agendar</button>
   </div>
 
   <div id="conteudo-abas">
     <div id="tab-cadastro" class="tab-content">
       <div class="form-container">
-
         <div class="seletor-container">
           <div id="calendario-inline"></div>
           <div id="relogio-inline"></div>
         </div>
         <input type="hidden" id="data-selecionada">
         <input type="hidden" id="hora-selecionada">
+
         <label for="procedimento">Procedimento:</label>
-        <input type="text" id="procedimento" name="procedimento">
+        <input type="text" id="procedimento" name="procedimento" placeholder="Ex: Consulta de rotina">
 
         <label for="especialidade">Especialidade:</label>
-        <input type="text" id="especialidade" name="especialidade">
+        <input type="text" id="especialidade" name="especialidade" placeholder="Ex: Cardiologista">
 
         <label for="local">Local:</label>
-        <input type="text" id="local" name="local">
+        <input type="text" id="local" name="local" placeholder="Ex: Clínica Dr. Coração">
 
         <label for="paciente">Paciente:</label>
         <select id="paciente" name="paciente">
@@ -163,7 +248,7 @@
           <option value="Elza">Elza</option>
         </select>
 
-        <button type="button" onclick="adicionarAgendamento()">Salvar Agendamento</button>
+        <button type="button" class="btn btn-primary" onclick="adicionarAgendamento()">Salvar Agendamento</button>
       </div>
     </div>
 
@@ -171,10 +256,8 @@
       <div id="agendaTabela"></div>
     </div>
   </div>
-
-  <div class="footer">
-    <p>&copy; 2025 Agenda Médica de Eva e Elza</p>
-  </div>
+  
+</div>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -222,19 +305,9 @@
       const [ano, mes, dia] = data.split("-");
       const dataFormatada = `${dia}/${mes}/${ano}`;
 
-      const novoAgendamento = {
-        data: dataFormatada,
-        hora,
-        procedimento,
-        especialidade,
-        local,
-        paciente,
-        timestamp: new Date().toISOString()
-      };
+      const novoAgendamento = { data: dataFormatada, hora, procedimento, especialidade, local, paciente, timestamp: new Date().toISOString() };
 
-      const referencia = agendamentoEmEdicao
-        ? database.ref('agendamentos/' + agendamentoEmEdicao)
-        : database.ref('agendamentos').push();
+      const referencia = agendamentoEmEdicao ? database.ref('agendamentos/' + agendamentoEmEdicao) : database.ref('agendamentos').push();
 
       referencia.set(novoAgendamento).then(() => {
         alert(agendamentoEmEdicao ? "Agendamento atualizado com sucesso!" : "Agendamento adicionado com sucesso!");
@@ -247,7 +320,7 @@
       if (calendarInstance) calendarInstance.clear();
       if (timeInstance) {
         timeInstance.clear();
-        timeInstance.setDate(new Date()); // Reseta o relógio para a hora atual
+        timeInstance.setDate(new Date());
       }
       
       document.getElementById('data-selecionada').value = '';
@@ -261,9 +334,7 @@
 
     function confirmarExclusao(id) {
       if (window.confirm("Tem certeza que deseja excluir este agendamento?")) {
-        database.ref('agendamentos/' + id).remove().then(() => {
-          alert("Agendamento excluído com sucesso!");
-        }).catch(error => alert("Erro ao excluir: " + error.message));
+        database.ref('agendamentos/' + id).remove().then(() => alert("Agendamento excluído com sucesso!")).catch(error => alert("Erro ao excluir: " + error.message));
       }
     }
 
@@ -309,15 +380,21 @@
           div.className = 'agendamento-card';
           div.id = agendamento.id;
           div.innerHTML = `
-            <h3>Paciente: ${agendamento.paciente}</h3>
-            <p><strong>Data:</strong> ${agendamento.data}</p>
-            <p><strong>Hora:</strong> ${agendamento.hora}</p>
-            <p><strong>Procedimento:</strong> ${agendamento.procedimento}</p>
-            <p><strong>Especialidade:</strong> ${agendamento.especialidade}</p>
-            <p><strong>Local:</strong> ${agendamento.local}</p>
-            <button onclick="editarAgendamento('${agendamento.id}')">Editar</button>
-            <button onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
-            <button onclick="compartilharImagem('${agendamento.id}')">Compartilhar</button>`;
+            <div class="card-header">
+              <h3>Paciente: ${agendamento.paciente}</h3>
+            </div>
+            <div class="card-body">
+              <p><strong>Data:</strong> ${agendamento.data}</p>
+              <p><strong>Hora:</strong> ${agendamento.hora}</p>
+              <p><strong>Procedimento:</strong> ${agendamento.procedimento}</p>
+              <p><strong>Especialidade:</strong> ${agendamento.especialidade}</p>
+              <p><strong>Local:</strong> ${agendamento.local}</p>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-secondary" onclick="editarAgendamento('${agendamento.id}')">Editar</button>
+              <button class="btn btn-danger" onclick="confirmarExclusao('${agendamento.id}')">Excluir</button>
+              <button class="btn btn-default" onclick="compartilharImagem('${agendamento.id}')">Compartilhar</button>
+            </div>`;
           tabela.appendChild(div);
         });
     });
@@ -339,26 +416,16 @@
       flatpickr.localize(flatpickr.l10ns.pt);
 
       calendarInstance = flatpickr("#calendario-inline", {
-        inline: true,
-        dateFormat: "Y-m-d",
-        onChange: (selectedDates, dateStr) => {
-          document.getElementById('data-selecionada').value = dateStr;
-        }
+        inline: true, dateFormat: "Y-m-d",
+        onChange: (d, ds) => { document.getElementById('data-selecionada').value = ds; }
       });
 
       timeInstance = flatpickr("#relogio-inline", {
-        inline: true,
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        time_24hr: true,
-        defaultDate: new Date(), // Define a hora inicial para a hora atual
-        onChange: (selectedDates, dateStr) => {
-          document.getElementById('hora-selecionada').value = dateStr;
-        }
+        inline: true, enableTime: true, noCalendar: true,
+        dateFormat: "H:i", time_24hr: true, defaultDate: new Date(),
+        onChange: (d, ds) => { document.getElementById('hora-selecionada').value = ds; }
       });
       
-      // Define o valor inicial da hora no input escondido
       const agora = new Date();
       const horas = String(agora.getHours()).padStart(2, '0');
       const minutos = String(agora.getMinutes()).padStart(2, '0');
