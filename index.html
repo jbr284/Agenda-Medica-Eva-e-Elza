@@ -239,6 +239,9 @@
         <label for="especialidade">Especialidade:</label>
         <input type="text" id="especialidade" name="especialidade" placeholder="Ex: Cardiologista">
 
+        <label for="medico" id="label-medico">Médico:</label>
+        <input type="text" id="medico" name="medico" placeholder="Ex: Dr. House">
+
         <label for="local">Local:</label>
         <input type="text" id="local" name="local" placeholder="Ex: Clínica Dr. Coração">
 
@@ -296,6 +299,7 @@
       const procedimento = document.getElementById('procedimento').value;
       const especialidade = document.getElementById('especialidade').value;
       const local = document.getElementById('local').value;
+      const medico = document.getElementById('medico').value; // NOVO: Captura o valor do campo médico
       const paciente = document.getElementById('paciente').value;
       
       if (!data || !hora || !procedimento || !especialidade || !local || !paciente) {
@@ -305,7 +309,8 @@
       const [ano, mes, dia] = data.split("-");
       const dataFormatada = `${dia}/${mes}/${ano}`;
 
-      const novoAgendamento = { data: dataFormatada, hora, procedimento, especialidade, local, paciente, timestamp: new Date().toISOString() };
+      // NOVO: Adiciona o campo 'medico' ao objeto a ser salvo
+      const novoAgendamento = { data: dataFormatada, hora, procedimento, especialidade, local, medico, paciente, timestamp: new Date().toISOString() };
 
       const referencia = agendamentoEmEdicao ? database.ref('agendamentos/' + agendamentoEmEdicao) : database.ref('agendamentos').push();
 
@@ -328,8 +333,12 @@
       document.getElementById('procedimento').value = '';
       document.getElementById('especialidade').value = '';
       document.getElementById('local').value = '';
+      document.getElementById('medico').value = ''; // NOVO: Limpa o campo médico
       document.getElementById('paciente').value = 'Eva';
       agendamentoEmEdicao = null;
+
+      // NOVO: Reseta o label do médico para o padrão
+      document.getElementById('label-medico').textContent = 'Médico:';
     }
 
     function confirmarExclusao(id) {
@@ -351,8 +360,12 @@
         document.getElementById('procedimento').value = agendamento.procedimento;
         document.getElementById('especialidade').value = agendamento.especialidade;
         document.getElementById('local').value = agendamento.local;
+        document.getElementById('medico').value = agendamento.medico || ''; // NOVO: Preenche o campo médico
         document.getElementById('paciente').value = agendamento.paciente;
         agendamentoEmEdicao = id;
+        
+        // NOVO: Dispara o evento de input para garantir que o label do médico seja atualizado
+        document.getElementById('procedimento').dispatchEvent(new Event('input'));
         
         mostrarAba('cadastro');
         window.scrollTo(0, 0);
@@ -379,6 +392,7 @@
           const div = document.createElement('div');
           div.className = 'agendamento-card';
           div.id = agendamento.id;
+          // AJUSTE: Adicionada a linha para exibir o médico, com lógica para não quebrar registros antigos
           div.innerHTML = `
             <div class="card-header">
               <h3>Paciente: ${agendamento.paciente}</h3>
@@ -388,6 +402,7 @@
               <p><strong>Hora:</strong> ${agendamento.hora}</p>
               <p><strong>Procedimento:</strong> ${agendamento.procedimento}</p>
               <p><strong>Especialidade:</strong> ${agendamento.especialidade}</p>
+              ${agendamento.medico ? `<p><strong>Médico:</strong> ${agendamento.medico}</p>` : ''}
               <p><strong>Local:</strong> ${agendamento.local}</p>
             </div>
             <div class="card-footer">
@@ -430,6 +445,18 @@
       const horas = String(agora.getHours()).padStart(2, '0');
       const minutos = String(agora.getMinutes()).padStart(2, '0');
       document.getElementById('hora-selecionada').value = `${horas}:${minutos}`;
+
+      // NOVO: Lógica para o rótulo dinâmico do campo médico
+      document.getElementById('procedimento').addEventListener('input', function(event) {
+        const procedimentoTexto = event.target.value.toLowerCase();
+        const labelMedico = document.getElementById('label-medico');
+        
+        if (procedimentoTexto.includes('exame')) {
+          labelMedico.textContent = 'Médico Solicitante:';
+        } else {
+          labelMedico.textContent = 'Médico:';
+        }
+      });
 
       mostrarAba('lista');
     });
