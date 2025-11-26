@@ -638,8 +638,25 @@
       });
     });
 
+// === CÓDIGO DE ATUALIZAÇÃO AUTOMÁTICA ===
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js');
+      // Variável para evitar recarregamento infinito
+      let refreshing = false;
+
+      // 1. Escuta se o "motor" (Service Worker) mudou
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (!refreshing) {
+          window.location.reload(); //
+          refreshing = true;
+        }
+      });
+
+      // 2. Registra o Service Worker
+      navigator.serviceWorker.register('service-worker.js').then(registration => {
+        console.log('SW Registrado:', registration);
+      }).catch(error => {
+        console.log('Falha no SW:', error);
+      });
     }
   </script>
 </body>
