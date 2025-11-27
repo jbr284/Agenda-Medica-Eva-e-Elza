@@ -269,7 +269,7 @@
       <p style="margin-bottom: 30px; color: #666;">Selecione como deseja acessar:</p>
       
       <div class="login-buttons">
-          <button class="btn-login btn-visitante" onclick="entrarModoVisitante()">👁️Visualizar Agenda</button>
+          <button class="btn-login btn-visitante" onclick="entrarModoVisitante()">👁️ Apenas Visualizar</button>
           <button class="btn-login btn-admin" onclick="entrarModoAdmin()">🔐 Área Restrita (Agendar)</button>
       </div>
   </div>
@@ -372,7 +372,7 @@
 
     let agendamentoEmEdicao = null;
     let modoAdmin = false; 
-    let dadosCache = null; // Variável para guardar os dados do Firebase
+    let dadosCache = null;
 
     // === LÓGICA DE ACESSO ===
 
@@ -383,7 +383,7 @@
 
     function entrarModoAdmin() {
         const senhaDigitada = prompt("Digite a senha de administrador:");
-        if (senhaDigitada === "1001") { 
+        if (senhaDigitada === "1234") { 
             modoAdmin = true;
             iniciarApp();
         } else {
@@ -402,13 +402,12 @@
             document.getElementById('btn-tab-cadastro').classList.add('hidden');
         }
 
-        // FORÇA O REDESENHO DA LISTA
-        // Se já temos dados baixados, redesenha agora com os novos poderes (modoAdmin)
+        // Se já temos dados, renderiza a lista no fundo, mas NÃO abre a aba
         if (dadosCache) {
             renderizarLista(dadosCache);
         }
         
-        abrirAbaDireto('lista');
+        // REMOVIDA A LINHA QUE FORÇAVA A ABERTURA: abrirAbaDireto('lista');
     }
 
     function sairDoApp() {
@@ -416,6 +415,7 @@
         document.getElementById('tela-login').classList.remove('hidden');
         
         modoAdmin = false;
+        // Fecha todas as abas
         document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('active'));
         document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
     }
@@ -540,9 +540,8 @@
       }
     }
 
-    // === LISTAGEM E RENDERIZAÇÃO ===
+    // === LISTAGEM ===
     
-    // Função separada que só desenha na tela
     function renderizarLista(agendamentos) {
         const tabela = document.getElementById('agendaTabela');
         tabela.innerHTML = '';
@@ -578,7 +577,6 @@
                 <p><strong>Local:</strong> ${agendamento.local}</p>
               </div>`;
 
-            // AQUI ESTÁ A MÁGICA: VERIFICA A VARIÁVEL modoAdmin
             if (modoAdmin) {
               cardHtml += `
               <div class="card-footer">
@@ -593,11 +591,10 @@
           });
     }
 
-    // Ouve o Firebase e atualiza o Cache + Tela
     const agendaRef = database.ref('agendamentos');
     agendaRef.on('value', snapshot => {
-      dadosCache = snapshot.val(); // Guarda os dados na memória
-      renderizarLista(dadosCache); // Desenha na tela (como visitante no início)
+      dadosCache = snapshot.val();
+      renderizarLista(dadosCache);
     });
 
     function compartilharImagem(agendamentoId) {
@@ -613,51 +610,27 @@
       });
     }
 
-    // === INICIALIZAÇÃO ===
-    window.addEventListener('DOMContentLoaded', () => {
-      flatpickr.localize(flatpickr.l10ns.pt);
-
-      flatpickr("#data-input", {
-        dateFormat: "Y-m-d",
-        altInput: true,
-        altFormat: "d/m/Y", 
-        disableMobile: false 
-      });
-
-      flatpickr("#hora-input", {
-        enableTime: true,
-        noCalendar: true,
-        dateFormat: "H:i",
-        time_24hr: true
-      });
-
-      document.getElementById('procedimento').addEventListener('input', function(event) {
-        const texto = event.target.value.toLowerCase();
-        const label = document.getElementById('label-medico');
-        label.textContent = texto.includes('exame') ? 'Médico Solicitante:' : 'Médico:';
-      });
-    });
-
-// === CÓDIGO DE ATUALIZAÇÃO AUTOMÁTICA ===
+    // === ATUALIZAÇÃO AUTOMÁTICA DO PWA ===
     if ('serviceWorker' in navigator) {
-      // Variável para evitar recarregamento infinito
       let refreshing = false;
-
-      // 1. Escuta se o "motor" (Service Worker) mudou
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         if (!refreshing) {
-          window.location.reload(); //
+          window.location.reload();
           refreshing = true;
         }
       });
-
-      // 2. Registra o Service Worker
-      navigator.serviceWorker.register('service-worker.js').then(registration => {
-        console.log('SW Registrado:', registration);
-      }).catch(error => {
-        console.log('Falha no SW:', error);
-      });
+      navigator.serviceWorker.register('service-worker.js');
     }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      flatpickr.localize(flatpickr.l10ns.pt);
+      flatpickr("#data-input", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m/Y", disableMobile: false });
+      flatpickr("#hora-input", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
+      document.getElementById('procedimento').addEventListener('input', function(event) {
+        const texto = event.target.value.toLowerCase();
+        document.getElementById('label-medico').textContent = texto.includes('exame') ? 'Médico Solicitante:' : 'Médico:';
+      });
+    });
   </script>
 </body>
 </html>
