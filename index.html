@@ -269,7 +269,7 @@
       <p style="margin-bottom: 30px; color: #666;">Selecione como deseja acessar:</p>
       
       <div class="login-buttons">
-          <button class="btn-login btn-visitante" onclick="entrarModoVisitante()">👁️ Apenas Visualizar</button>
+          <button class="btn-login btn-visitante" onclick="entrarModoVisitante()">👁️Visualizar Agenda</button>
           <button class="btn-login btn-admin" onclick="entrarModoAdmin()">🔐 Área Restrita (Agendar)</button>
       </div>
   </div>
@@ -383,7 +383,7 @@
 
     function entrarModoAdmin() {
         const senhaDigitada = prompt("Digite a senha de administrador:");
-        if (senhaDigitada === "1234") { 
+        if (senhaDigitada === "1001") { 
             modoAdmin = true;
             iniciarApp();
         } else {
