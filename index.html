@@ -402,12 +402,10 @@
             document.getElementById('btn-tab-cadastro').classList.add('hidden');
         }
 
-        // Se já temos dados, renderiza a lista no fundo, mas NÃO abre a aba
+        // Se já temos dados, renderiza a lista no fundo
         if (dadosCache) {
             renderizarLista(dadosCache);
         }
-        
-        // REMOVIDA A LINHA QUE FORÇAVA A ABERTURA: abrirAbaDireto('lista');
     }
 
     function sairDoApp() {
@@ -597,15 +595,31 @@
       renderizarLista(dadosCache);
     });
 
+    // === CORREÇÃO: COMPARTILHAR SEM OS BOTÕES ===
     function compartilharImagem(agendamentoId) {
       const agendamentoCard = document.getElementById(agendamentoId);
+      
+      // 1. Encontra o rodapé dos botões
+      const rodapeBotoes = agendamentoCard.querySelector('.card-footer');
+
+      // 2. Esconde antes da foto
+      if (rodapeBotoes) {
+        rodapeBotoes.style.display = 'none';
+      }
+
       html2canvas(agendamentoCard, {
         onrendered: canvas => {
+          // Salva imagem
           const imagem = canvas.toDataURL('image/jpeg');
           const link = document.createElement('a');
           link.href = imagem;
           link.download = 'agendamento.jpg';
           link.click();
+
+          // 3. Restaura os botões
+          if (rodapeBotoes) {
+            rodapeBotoes.style.display = 'flex';
+          }
         }
       });
     }
