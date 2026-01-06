@@ -1,4 +1,5 @@
-const CACHE_NAME = 'agenda-cache-v2'; // Mude v2 para v3, v4... sempre que atualizar o código!
+const CACHE_NAME = 'agenda-medica-v4'; // <--- IMPORTANTE: Mude este número (v4, v5, v6...) a cada alteração no código!
+
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -14,49 +15,50 @@ const ASSETS_TO_CACHE = [
   'https://npmcdn.com/flatpickr/dist/l10n/pt.js'
 ];
 
-// 1. Instalação: Baixa os arquivos e força a atualização imediata
-self.addEventListener('install', function(event) {
-  // Força o SW a ativar imediatamente, sem esperar o usuário fechar o app
-  self.skipWaiting(); //
+// 1. INSTALAÇÃO: Força a entrada imediata
+self.addEventListener('install', (event) => {
+  console.log('👷 SW: Instalando nova versão:', CACHE_NAME);
+  
+  // O skipWaiting() faz o novo SW "furar a fila" e não esperar o usuário fechar o app
+  self.skipWaiting();
 
   event.waitUntil(
-    caches.open(CACHE_NAME).then(function(cache) {
-      console.log('Abrindo cache e salvando arquivos...');
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('📦 SW: Caching arquivos...');
       return cache.addAll(ASSETS_TO_CACHE);
     })
   );
 });
 
-// 2. Ativação: Limpa caches antigos e assume o controle
-self.addEventListener('activate', function(event) {
+// 2. ATIVAÇÃO: Limpeza agressiva de caches antigos e toma o controle
+self.addEventListener('activate', (event) => {
+  console.log('🚀 SW: Ativando e limpando caches antigos...');
+  
   event.waitUntil(
-    caches.keys().then(function(cacheNames) {
+    caches.keys().then((keyList) => {
       return Promise.all(
-        cacheNames.map(function(cacheName) {
-          // Se o cache não for o atual (v2), apaga ele!
-          if (cacheName !== CACHE_NAME) {
-            console.log('Apagando cache antigo:', cacheName);
-            return caches.delete(cacheName);
+        keyList.map((key) => {
+          // Se o cache não for exatamente o da versão atual, APAGA SEM DÓ!
+          if (key !== CACHE_NAME) {
+            console.log('🧹 SW: Removendo cache antigo:', key);
+            return caches.delete(key);
           }
         })
       );
     }).then(() => {
-      // Força o SW a controlar todas as abas/janelas abertas agora
-      return self.clients.claim(); //
+      // O clients.claim() diz: "Ei, abas abertas, eu sou o chefe agora!"
+      console.log('👑 SW: Assumindo controle das páginas abertas.');
+      return self.clients.claim();
     })
   );
 });
 
-// 3. Interceptação (Fetch): Serve arquivos do cache se houver, ou busca na rede
-self.addEventListener('fetch', function(event) {
+// 3. INTERCEPTAÇÃO: Estratégia "Cache First" (rápido), mas confiando na atualização do passo 2
+self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then(function(response) {
-      // Cache hit - retorna a resposta do cache
-      if (response) {
-        return response;
-      }
-      // Se não tem no cache, busca na rede
-      return fetch(event.request);
+    caches.match(event.request).then((response) => {
+      // Se achou no cache, retorna ele. Se não, busca na rede.
+      return response || fetch(event.request);
     })
   );
 });
