@@ -12,13 +12,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// === VARIÁVEIS GLOBAIS ===
 let agendamentoEmEdicao = null;
 let modoAdmin = false; 
 let dadosCache = null;
-let filtroAtual = 'Todas'; // Inicia mostrando as duas pacientes
+let filtroAtual = 'Todas';
 
-// === LÓGICA DE ACESSO (Com SweetAlert2) ===
+// === LÓGICA DE ACESSO ===
 function entrarModoVisitante() {
     modoAdmin = false;
     iniciarApp();
@@ -30,7 +29,7 @@ async function entrarModoAdmin() {
         input: 'password',
         inputLabel: 'Digite a senha de administrador',
         inputPlaceholder: 'Senha',
-        confirmButtonColor: '#007acc',
+        confirmButtonColor: '#2563eb',
         cancelButtonColor: '#a0aec0',
         showCancelButton: true,
         cancelButtonText: 'Cancelar',
@@ -42,20 +41,15 @@ async function entrarModoAdmin() {
         iniciarApp();
         Swal.fire({icon: 'success', title: 'Acesso Liberado!', timer: 1500, showConfirmButton: false});
     } else if (senha) {
-        Swal.fire({icon: 'error', title: 'Senha Incorreta!', confirmButtonColor: '#007acc'});
+        Swal.fire({icon: 'error', title: 'Senha Incorreta!', confirmButtonColor: '#2563eb'});
     }
 }
 
 function iniciarApp() {
     document.getElementById('tela-login').classList.add('hidden');
     document.getElementById('app-principal').classList.remove('hidden');
-
-    if (modoAdmin) {
-        document.getElementById('btn-tab-cadastro').classList.remove('hidden');
-    } else {
-        document.getElementById('btn-tab-cadastro').classList.add('hidden');
-    }
-
+    if (modoAdmin) document.getElementById('btn-tab-cadastro').classList.remove('hidden');
+    else document.getElementById('btn-tab-cadastro').classList.add('hidden');
     if (dadosCache) renderizarLista(dadosCache);
 }
 
@@ -67,16 +61,10 @@ function sairDoApp() {
     document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
 }
 
-// === LÓGICA DE ABAS E FILTROS ===
+// === ABAS E FILTROS ===
 function toggleAba(nomeAba) {
     const abaDestino = document.getElementById(`tab-${nomeAba}`);
-    const btnDestino = document.getElementById(`btn-tab-${nomeAba}`);
-    
-    if (abaDestino.classList.contains('active')) {
-        abaDestino.classList.remove('active');
-        btnDestino.classList.remove('active');
-        return;
-    }
+    if (abaDestino.classList.contains('active')) return;
     abrirAbaDireto(nomeAba);
 }
 
@@ -94,13 +82,12 @@ function aplicarFiltro(paciente) {
     renderizarLista(dadosCache);
 }
 
-// === CRUD (Com SweetAlert2) ===
+// === CRUD ===
 function adicionarAgendamento() {
     if (!modoAdmin) return; 
 
     const btnSalvar = document.getElementById('btn-salvar');
-    const textoOriginal = btnSalvar.innerText;
-    btnSalvar.innerText = "Salvando...";
+    btnSalvar.innerHTML = `<i class="ph-bold ph-spinner-gap ph-spin"></i> Salvando...`;
     btnSalvar.disabled = true;
 
     const data = document.getElementById('data-input').value; 
@@ -112,8 +99,8 @@ function adicionarAgendamento() {
     const paciente = document.getElementById('paciente').value;
     
     if (!data || !hora || !procedimento || !paciente) {
-        Swal.fire({icon: 'warning', title: 'Atenção', text: 'Preencha Data, Hora, Paciente e Procedimento.', confirmButtonColor: '#007acc'});
-        btnSalvar.innerText = textoOriginal;
+        Swal.fire({icon: 'warning', title: 'Atenção', text: 'Preencha Data, Hora, Paciente e Procedimento.', confirmButtonColor: '#2563eb'});
+        btnSalvar.innerHTML = `<i class="ph-bold ph-floppy-disk"></i> Gravar Agendamento`;
         btnSalvar.disabled = false;
         return;
     }
@@ -128,9 +115,9 @@ function adicionarAgendamento() {
         limparCampos();
         abrirAbaDireto('lista'); 
     }).catch(error => {
-        Swal.fire({icon: 'error', title: 'Erro de conexão', text: error.message});
+        Swal.fire({icon: 'error', title: 'Erro', text: error.message});
     }).finally(() => {
-        btnSalvar.innerText = "Salvar Agendamento";
+        btnSalvar.innerHTML = `<i class="ph-bold ph-floppy-disk"></i> Gravar Agendamento`;
         btnSalvar.disabled = false;
     });
 }
@@ -143,10 +130,8 @@ function limparCampos() {
     document.getElementById('local').value = '';
     document.getElementById('medico').value = '';
     document.getElementById('paciente').value = 'Eva';
-    document.getElementById('btn-salvar').innerText = "Salvar Agendamento";
     document.getElementById('btn-cancelar').style.display = 'none';
     agendamentoEmEdicao = null;
-    document.getElementById('label-medico').textContent = 'Médico:';
 }
 
 function cancelarEdicao() {
@@ -168,9 +153,7 @@ function editarAgendamento(id) {
         document.getElementById('paciente').value = agendamento.paciente;
         
         agendamentoEmEdicao = id;
-        document.getElementById('btn-salvar').innerText = "Atualizar Agendamento";
         document.getElementById('btn-cancelar').style.display = 'block';
-        document.getElementById('procedimento').dispatchEvent(new Event('input'));
         
         abrirAbaDireto('cadastro');
         window.scrollTo(0, 0);
@@ -180,12 +163,12 @@ function editarAgendamento(id) {
 async function confirmarExclusao(id) {
     if (!modoAdmin) return;
     const result = await Swal.fire({
-        title: 'Tem certeza?',
-        text: "Esta consulta será apagada permanentemente!",
+        title: 'Excluir Consulta?',
+        text: "Essa ação não pode ser desfeita.",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#e53e3e',
-        cancelButtonColor: '#a0aec0',
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#cbd5e1',
         confirmButtonText: 'Sim, apagar',
         cancelButtonText: 'Cancelar'
     });
@@ -196,17 +179,18 @@ async function confirmarExclusao(id) {
     }
 }
 
-// === LISTAGEM E INTELIGÊNCIA TEMPORAL ===
+// === RENDERIZAÇÃO DE CARDS PREMIUM ===
 function renderizarLista(agendamentos) {
     const tabela = document.getElementById('agendaTabela');
     tabela.innerHTML = '';
     
     if (!agendamentos) {
-        tabela.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum agendamento encontrado.</p>';
+        tabela.innerHTML = '<p class="loading-text">Nenhum agendamento encontrado.</p>';
         return;
     }
 
-    const agora = new Date();
+    const hojeObj = new Date();
+    hojeObj.setHours(0,0,0,0);
 
     const listaFiltrada = Object.keys(agendamentos)
         .map(id => ({ id, ...agendamentos[id] }))
@@ -214,44 +198,70 @@ function renderizarLista(agendamentos) {
         .map(a => {
             const [dia, mes, ano] = a.data.split('/');
             a.dataObj = new Date(`${ano}-${mes}-${dia}T${a.hora || '00:00'}`);
-            a.passou = a.dataObj < agora; // Identifica se já ficou no passado
+            
+            // Lógica de tempo para os Badges
+            const dataBase = new Date(`${ano}-${mes}-${dia}T00:00:00`);
+            const diffTime = dataBase - hojeObj;
+            a.diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            a.passou = a.diffDays < 0; 
             return a;
         })
         .sort((a, b) => {
-            // Ordenação: Joga os eventos passados pro final, eventos futuros ficam em cima cronologicamente
             if (a.passou && !b.passou) return 1;
             if (!a.passou && b.passou) return -1;
             return a.dataObj - b.dataObj;
         });
 
     if (listaFiltrada.length === 0) {
-        tabela.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum agendamento para este filtro.</p>';
+        tabela.innerHTML = '<p class="loading-text">Nenhum agendamento para este filtro.</p>';
         return;
     }
 
-    listaFiltrada.forEach(agendamento => {
+    const mesesAbrev = ['JAN','FEV','MAR','ABR','MAI','JUN','JUL','AGO','SET','OUT','NOV','DEZ'];
+
+    listaFiltrada.forEach(ag => {
         const div = document.createElement('div');
-        div.className = `agendamento-card ${agendamento.passou ? 'passado' : ''}`;
-        div.id = agendamento.id;
+        const themeClass = ag.paciente === 'Eva' ? 'theme-eva' : 'theme-elza';
+        div.className = `agendamento-card ${themeClass} ${ag.passou ? 'passado' : ''}`;
+        div.id = ag.id;
+
+        const [dia, mes] = ag.data.split('/');
+        const nomeMes = mesesAbrev[parseInt(mes) - 1];
+
+        // Lógica de Badges
+        let badgeHtml = '';
+        if (ag.passou) badgeHtml = `<span class="badge-concluido"><i class="ph-bold ph-check-circle"></i> Concluído</span>`;
+        else if (ag.diffDays === 0) badgeHtml = `<span class="badge-hoje"><i class="ph-fill ph-warning-circle"></i> Hoje!</span>`;
+        else if (ag.diffDays === 1) badgeHtml = `<span class="badge-amanha"><i class="ph-fill ph-lightning"></i> Amanhã</span>`;
+        else if (ag.diffDays > 1 && ag.diffDays <= 7) badgeHtml = `<span class="badge-semana"><i class="ph-fill ph-calendar-blank"></i> Em ${ag.diffDays} dias</span>`;
 
         let cardHtml = `
-            <div class="card-header">
-            <h3>${agendamento.paciente} ${agendamento.passou ? '<span class="badge-concluido">Concluído</span>' : ''}</h3>
-            </div>
-            <div class="card-body">
-            <p><strong>Data:</strong> ${agendamento.data} às ${agendamento.hora}</p>
-            <p><strong>Procedimento:</strong> ${agendamento.procedimento}</p>
-            ${agendamento.especialidade ? `<p><strong>Especialidade:</strong> ${agendamento.especialidade}</p>` : ''}
-            ${agendamento.medico ? `<p><strong>Profissional:</strong> ${agendamento.medico}</p>` : ''}
-            <p><strong>Local:</strong> ${agendamento.local}</p>
+            <div class="card-main">
+                <div class="card-calendar">
+                    <span class="dia">${dia}</span>
+                    <span class="mes">${nomeMes}</span>
+                    <span class="hora"><i class="ph-bold ph-clock"></i> ${ag.hora}</span>
+                </div>
+                <div class="card-content">
+                    <div class="card-header">
+                        <h3>${ag.paciente}</h3>
+                        ${badgeHtml}
+                    </div>
+                    <div class="card-body">
+                        <p><i class="ph-fill ph-stethoscope"></i> <span><strong>Procedimento:</strong> ${ag.procedimento}</span></p>
+                        ${ag.especialidade ? `<p><i class="ph-fill ph-first-aid"></i> <span><strong>Especialidade:</strong> ${ag.especialidade}</span></p>` : ''}
+                        ${ag.medico ? `<p><i class="ph-fill ph-user-circle"></i> <span><strong>Profissional:</strong> ${ag.medico}</span></p>` : ''}
+                        <p><i class="ph-fill ph-map-pin"></i> <span><strong>Local:</strong> ${ag.local}</span></p>
+                    </div>
+                </div>
             </div>`;
 
         if (modoAdmin) {
             cardHtml += `
             <div class="card-footer">
-            <button class="btn btn-secondary" onclick="editarAgendamento('${agendamento.id}')">✏️ Editar</button>
-            <button class="btn btn-danger" onclick="confirmarExclusao('${agendamento.id}')">🗑️ Excluir</button>
-            <button class="btn btn-share" onclick="compartilharImagem('${agendamento.id}')">📷 Compartilhar</button>
+                <button class="btn-ghost btn-ghost-edit" onclick="editarAgendamento('${ag.id}')"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                <button class="btn-ghost btn-ghost-delete" onclick="confirmarExclusao('${ag.id}')"><i class="ph-bold ph-trash"></i> Excluir</button>
+                <button class="btn-ghost btn-ghost-share" onclick="compartilharImagem('${ag.id}')"><i class="ph-bold ph-share-network"></i> Compartilhar</button>
             </div>`;
         }
 
@@ -266,74 +276,44 @@ agendaRef.on('value', snapshot => {
     renderizarLista(dadosCache);
 });
 
-// === MELHORIA: COMPARTILHAR COM WEB SHARE API ===
+// === COMPARTILHAMENTO INTELIGENTE ===
 function compartilharImagem(agendamentoId) {
     const agendamentoCard = document.getElementById(agendamentoId);
     const rodapeBotoes = agendamentoCard.querySelector('.card-footer');
-
     if (rodapeBotoes) rodapeBotoes.style.display = 'none';
 
     html2canvas(agendamentoCard, {
         onrendered: async canvas => {
             if (rodapeBotoes) rodapeBotoes.style.display = 'flex';
-            
             const dataUrl = canvas.toDataURL('image/jpeg');
             
-            // Tenta abrir a gaveta de compartilhamento nativa (WhatsApp, etc.)
             try {
                 const blob = await (await fetch(dataUrl)).blob();
                 const file = new File([blob], 'agendamento.jpg', { type: 'image/jpeg' });
                 
                 if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({
-                        title: 'Agendamento Médico',
-                        text: 'Segue o lembrete da nossa consulta:',
-                        files: [file]
-                    });
-                    return; // Se funcionou, não faz o download automático
+                    await navigator.share({ title: 'Agendamento Médico', text: 'Segue o lembrete da nossa consulta:', files: [file] });
+                    return; 
                 }
-            } catch (e) {
-                console.log("Compartilhamento cancelado ou não suportado na plataforma.");
-            }
+            } catch (e) { console.log("Compartilhamento nativo não suportado."); }
 
-            // Fallback (Plano B): Se a Web Share API não funcionar (Ex: PC Desktop), faz o download direto
             const link = document.createElement('a');
-            link.href = dataUrl;
-            link.download = 'agendamento.jpg';
-            link.click();
+            link.href = dataUrl; link.download = 'agendamento.jpg'; link.click();
         }
     });
 }
 
-// === ATUALIZAÇÃO AUTOMÁTICA DO PWA ===
+// === PWA E PLUGINS ===
 if ('serviceWorker' in navigator) {
     let refreshing = false;
     navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-            window.location.reload();
-            refreshing = true;
-        }
+        if (!refreshing) { window.location.reload(); refreshing = true; }
     });
     navigator.serviceWorker.register('service-worker.js');
 }
 
-// === INICIALIZAÇÃO DE COMPONENTES ===
 window.addEventListener('DOMContentLoaded', () => {
     flatpickr.localize(flatpickr.l10ns.pt);
-    
-    // Melhoria: Trava o minDate para hoje (Evita agendamentos passados por engano)
-    flatpickr("#data-input", { 
-        dateFormat: "Y-m-d", 
-        altInput: true, 
-        altFormat: "d/m/Y", 
-        disableMobile: false,
-        minDate: "today" 
-    });
-    
+    flatpickr("#data-input", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m/Y", disableMobile: false, minDate: "today" });
     flatpickr("#hora-input", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
-    
-    document.getElementById('procedimento').addEventListener('input', function(event) {
-        const texto = event.target.value.toLowerCase();
-        document.getElementById('label-medico').textContent = texto.includes('exame') ? 'Médico Solicitante:' : 'Médico:';
-    });
 });
