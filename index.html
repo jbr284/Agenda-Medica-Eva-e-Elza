@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agenda Médica de Eva e Elza</title>
+  <title>Agenda Médica | Eva e Elza</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -17,104 +17,120 @@
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icon-192x192.png" sizes="192x192" type="image/png" />
   <link rel="apple-touch-icon" href="icon-512x512.png" />
-  <meta name="theme-color" content="#007acc" />
+  <meta name="theme-color" content="#0f172a" />
 </head>
 <body>
 
-<div class="main-container">
+  <header class="app-header">
+    <div class="header-content">
+        <h1>Agenda Médica <span>| Eva & Elza</span></h1>
+        <button id="btn-sair" class="btn-voltar hidden" onclick="sairDoApp()">Sair do Sistema</button>
+    </div>
+  </header>
 
-  <div id="tela-login" class="login-screen">
-      <h1>Agenda Médica<br>Eva e Elza</h1>
-      <p style="margin-bottom: 30px; color: #666;">Selecione como deseja acessar:</p>
-      
-      <div class="login-buttons">
-          <button class="btn-login btn-visitante" onclick="entrarModoVisitante()">👁️ Visualizar Agenda</button>
-          <button class="btn-login btn-admin" onclick="entrarModoAdmin()">🔐 Área Restrita (Agendar)</button>
-      </div>
-  </div>
+  <div class="main-wrapper">
+      <div class="main-container">
 
-  <div id="app-principal" class="hidden">
-      
-      <div class="app-header">
-          <button class="btn-voltar" onclick="sairDoApp()">⬅ Sair</button>
-          <h1>Agenda Médica</h1>
-      </div>
-
-      <div class="tabs-navigation">
-        <button id="btn-tab-lista" class="btn-tab" onclick="toggleAba('lista')">
-          📅 Consultas Agendadas
-        </button>
-        <button id="btn-tab-cadastro" class="btn-tab hidden" onclick="toggleAba('cadastro')">
-          ➕ Novo Agendamento
-        </button>
-      </div>
-
-      <div id="conteudo-abas">
-        
-        <div id="tab-cadastro" class="tab-content">
-          <div class="form-container">
+        <div id="tela-login" class="login-screen">
+            <h2 class="login-title">Acesso ao Sistema</h2>
+            <p class="login-subtitle">Selecione seu perfil de acesso para continuar.</p>
             
-            <div class="form-row">
-                <div class="input-group">
-                    <label for="data-input">Data:</label>
-                    <input type="text" id="data-input" placeholder="Selecione a data...">
-                </div>
-                <div class="input-group">
-                    <label for="hora-input">Hora:</label>
-                    <input type="text" id="hora-input" placeholder="00:00">
-                </div>
+            <div class="login-buttons">
+                <button class="btn-login btn-visitante" onclick="entrarModoVisitante()">
+                    <i>👁️</i> Visualizar Agenda
+                </button>
+                <button class="btn-login btn-admin" onclick="entrarModoAdmin()">
+                    <i>🔐</i> Acesso Restrito
+                </button>
             </div>
-
-            <div class="input-group">
-                <label for="paciente">Paciente:</label>
-                <select id="paciente" name="paciente">
-                  <option value="Eva">Eva</option>
-                  <option value="Elza">Elza</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label for="procedimento">Procedimento:</label>
-                <input type="text" id="procedimento" placeholder="Ex: Consulta, Exame de Sangue...">
-            </div>
-
-            <div class="input-group">
-                <label for="especialidade">Especialidade:</label>
-                <input type="text" id="especialidade" placeholder="Ex: Cardiologista, Clínico...">
-            </div>
-
-            <div class="input-group">
-                <label for="medico" id="label-medico">Médico:</label>
-                <input type="text" id="medico" placeholder="Nome do médico">
-            </div>
-
-            <div class="input-group">
-                <label for="local">Local:</label>
-                <input type="text" id="local" placeholder="Ex: Clínica Centro, Hospital X...">
-            </div>
-
-            <button type="button" id="btn-salvar" class="btn btn-primary" onclick="adicionarAgendamento()">Salvar Agendamento</button>
-            <button type="button" id="btn-cancelar" class="btn btn-cancelar hidden" onclick="cancelarEdicao()" style="display:none;">Cancelar Edição</button>
-          </div>
         </div>
 
-        <div id="tab-lista" class="tab-content">
-          
-          <div class="filtros-container">
-            <button id="filtro-todas" class="btn-filtro active" onclick="aplicarFiltro('Todas')">Todas</button>
-            <button id="filtro-eva" class="btn-filtro" onclick="aplicarFiltro('Eva')">Eva</button>
-            <button id="filtro-elza" class="btn-filtro" onclick="aplicarFiltro('Elza')">Elza</button>
-          </div>
+        <div id="app-principal" class="hidden">
+            
+            <div class="tabs-navigation">
+              <button id="btn-tab-lista" class="btn-tab" onclick="toggleAba('lista')">
+                📅 Consultas Agendadas
+              </button>
+              <button id="btn-tab-cadastro" class="btn-tab hidden" onclick="toggleAba('cadastro')">
+                ➕ Novo Agendamento
+              </button>
+            </div>
 
-          <div id="agendaTabela">
-              <p style="text-align: center; color: #aaa; margin-top: 20px;">Carregando agendamentos...</p>
-          </div>
+            <div id="conteudo-abas">
+              
+              <div id="tab-cadastro" class="tab-content">
+                <div class="form-container">
+                  
+                  <div class="form-row">
+                      <div class="input-group">
+                          <label for="data-input">Data da Consulta</label>
+                          <input type="text" id="data-input" placeholder="Selecione a data...">
+                      </div>
+                      <div class="input-group">
+                          <label for="hora-input">Horário</label>
+                          <input type="text" id="hora-input" placeholder="00:00">
+                      </div>
+                  </div>
+
+                  <div class="input-group">
+                      <label for="paciente">Paciente</label>
+                      <select id="paciente" name="paciente">
+                        <option value="Eva">Paciente: Eva</option>
+                        <option value="Elza">Paciente: Elza</option>
+                      </select>
+                  </div>
+
+                  <div class="input-group">
+                      <label for="procedimento">Procedimento Realizado</label>
+                      <input type="text" id="procedimento" placeholder="Ex: Consulta de Rotina, Exame de Sangue...">
+                  </div>
+
+                  <div class="form-row">
+                      <div class="input-group">
+                          <label for="especialidade">Especialidade</label>
+                          <input type="text" id="especialidade" placeholder="Ex: Cardiologia...">
+                      </div>
+                      <div class="input-group">
+                          <label for="medico" id="label-medico">Profissional</label>
+                          <input type="text" id="medico" placeholder="Nome do médico...">
+                      </div>
+                  </div>
+
+                  <div class="input-group">
+                      <label for="local">Local de Atendimento</label>
+                      <input type="text" id="local" placeholder="Ex: Clínica Centro, Hospital Municipal...">
+                  </div>
+
+                  <div class="form-actions">
+                      <button type="button" id="btn-salvar" class="btn btn-primary" onclick="adicionarAgendamento()">Gravar Agendamento</button>
+                      <button type="button" id="btn-cancelar" class="btn btn-cancelar hidden" onclick="cancelarEdicao()" style="display:none;">Cancelar Edição</button>
+                  </div>
+                </div>
+              </div>
+
+              <div id="tab-lista" class="tab-content">
+                
+                <div class="filtros-container">
+                  <button id="filtro-todas" class="btn-filtro active" onclick="aplicarFiltro('Todas')">Geral</button>
+                  <button id="filtro-eva" class="btn-filtro" onclick="aplicarFiltro('Eva')">Eva</button>
+                  <button id="filtro-elza" class="btn-filtro" onclick="aplicarFiltro('Elza')">Elza</button>
+                </div>
+
+                <div id="agendaTabela" class="agenda-grid">
+                    <p class="loading-text">Carregando base de dados...</p>
+                </div>
+              </div>
+
+            </div>
         </div>
-
+        
       </div>
   </div>
-  
-</div>
+
+  <footer class="app-footer">
+      <p>Gerenciamento de Agendamentos Médicos</p>
+      <small>Sistema de Controle Interno</small>
+  </footer>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
@@ -123,5 +139,18 @@
   <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
   
   <script src="app.js"></script>
+  
+  <script>
+      const originalIniciar = iniciarApp;
+      iniciarApp = function() {
+          originalIniciar();
+          document.getElementById('btn-sair').classList.remove('hidden');
+      }
+      const originalSair = sairDoApp;
+      sairDoApp = function() {
+          originalSair();
+          document.getElementById('btn-sair').classList.add('hidden');
+      }
+  </script>
 </body>
 </html>
