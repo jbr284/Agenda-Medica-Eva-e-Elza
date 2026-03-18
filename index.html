@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
   
   <link rel="stylesheet" href="style.css">
   
@@ -24,7 +25,7 @@
   <header class="app-header">
     <div class="header-content">
         <h1>Agenda Médica <span>| Eva & Elza</span></h1>
-        <button id="btn-sair" class="btn-voltar hidden" onclick="sairDoApp()">Sair do Sistema</button>
+        <button id="btn-sair" class="btn-voltar hidden" onclick="sairDoApp()"><i class="ph-bold ph-sign-out"></i> Sair</button>
     </div>
   </header>
 
@@ -37,10 +38,10 @@
             
             <div class="login-buttons">
                 <button class="btn-login btn-visitante" onclick="entrarModoVisitante()">
-                    <i>👁️</i> Visualizar Agenda
+                    <i class="ph-fill ph-eye"></i> Visualizar Agenda
                 </button>
                 <button class="btn-login btn-admin" onclick="entrarModoAdmin()">
-                    <i>🔐</i> Acesso Restrito
+                    <i class="ph-fill ph-lock-key"></i> Acesso Restrito
                 </button>
             </div>
         </div>
@@ -49,10 +50,10 @@
             
             <div class="tabs-navigation">
               <button id="btn-tab-lista" class="btn-tab" onclick="toggleAba('lista')">
-                📅 Consultas Agendadas
+                <i class="ph-bold ph-calendar-check"></i> Consultas Agendadas
               </button>
               <button id="btn-tab-cadastro" class="btn-tab hidden" onclick="toggleAba('cadastro')">
-                ➕ Novo Agendamento
+                <i class="ph-bold ph-plus-circle"></i> Novo Agendamento
               </button>
             </div>
 
@@ -102,7 +103,7 @@
                   </div>
 
                   <div class="form-actions">
-                      <button type="button" id="btn-salvar" class="btn btn-primary" onclick="adicionarAgendamento()">Gravar Agendamento</button>
+                      <button type="button" id="btn-salvar" class="btn btn-primary" onclick="adicionarAgendamento()"><i class="ph-bold ph-floppy-disk"></i> Gravar Agendamento</button>
                       <button type="button" id="btn-cancelar" class="btn btn-cancelar hidden" onclick="cancelarEdicao()" style="display:none;">Cancelar Edição</button>
                   </div>
                 </div>
@@ -117,7 +118,7 @@
                 </div>
 
                 <div id="agendaTabela" class="agenda-grid">
-                    <p class="loading-text">Carregando base de dados...</p>
+                    <p class="loading-text"><i class="ph-bold ph-spinner-gap ph-spin"></i> Carregando base de dados...</p>
                 </div>
               </div>
 
