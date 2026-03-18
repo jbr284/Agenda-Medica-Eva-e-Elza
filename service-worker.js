@@ -1,5 +1,5 @@
 // Versão atualizada para forçar a limpeza do cache defeituoso anterior
-const CACHE_NAME = 'agenda-medica-v6'; 
+const CACHE_NAME = 'agenda-medica-v8'; 
 
 const ASSETS_TO_CACHE = [
   './',
