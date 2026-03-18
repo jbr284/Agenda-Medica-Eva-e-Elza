@@ -5,260 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Agenda Médica de Eva e Elza</title>
   
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-192x192.png" sizes="192x192" type="image/png" />
+  <link rel="apple-touch-icon" href="icon-512x512.png" />
+  <meta name="theme-color" content="#007acc" />
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   
-  <style>
-    /* === VARIÁVEIS E GLOBAIS === */
-    :root {
-      --primary-color: #007acc;
-      --secondary-color: #5a67d8;
-      --danger-color: #e53e3e;
-      --light-gray: #f7fafc;
-      --gray-text: #4a5568;
-      --dark-text: #2d3748;
-      --border-color: #e2e8f0;
-      --shadow-color: rgba(0, 0, 0, 0.1);
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      font-family: 'Roboto', sans-serif;
-      background-color: var(--light-gray);
-      color: var(--gray-text);
-      padding: 20px;
-    }
-    
-    .main-container {
-        max-width: 800px;
-        margin: 20px auto;
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px var(--shadow-color);
-        padding: 2rem;
-        border: 1px solid var(--border-color);
-        min-height: 80vh; 
-    }
-
-    /* Utilitário para esconder elementos */
-    .hidden { display: none !important; }
-
-    h1 {
-      text-align: center;
-      color: var(--dark-text);
-      margin-bottom: 2rem;
-      font-size: 2rem;
-      font-weight: 700;
-    }
-
-    /* === TELA DE LOGIN / INICIAL === */
-    .login-screen {
-        text-align: center;
-        padding: 40px 20px;
-    }
-    .login-buttons {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-        max-width: 300px;
-        margin: 0 auto;
-    }
-    .btn-login {
-        padding: 15px;
-        font-size: 1.1rem;
-        border-radius: 8px;
-        border: none;
-        font-weight: bold;
-        cursor: pointer;
-        transition: transform 0.2s;
-        color: white;
-    }
-    .btn-login:active { transform: scale(0.98); }
-    .btn-visitante { background-color: var(--secondary-color); }
-    .btn-admin { background-color: var(--primary-color); }
-    
-    /* Header Interno com botão voltar */
-    .app-header {
-        position: relative;
-        margin-bottom: 20px;
-    }
-    .btn-voltar {
-        position: absolute;
-        left: 0;
-        top: 5px;
-        background: #e2e8f0;
-        border: none;
-        padding: 5px 10px;
-        border-radius: 15px;
-        cursor: pointer;
-        font-weight: bold;
-        color: var(--gray-text);
-    }
-    .btn-voltar:hover { background: #cbd5e0; }
-
-    /* === NAVEGAÇÃO (ABAS) === */
-    .tabs-navigation {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        margin-bottom: 20px;
-        flex-wrap: wrap;
-    }
-    
-    .btn-tab {
-        background-color: white;
-        border: 2px solid var(--primary-color);
-        color: var(--primary-color);
-        font-weight: 700;
-        padding: 12px 30px;
-        border-radius: 50px; 
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-size: 1rem;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-    
-    .btn-tab:hover {
-        background-color: #e6f7ff;
-        transform: translateY(-2px);
-    }
-    
-    .btn-tab.active {
-        background-color: var(--primary-color);
-        color: white;
-        box-shadow: 0 4px 10px rgba(0, 122, 204, 0.4);
-    }
-
-    .tab-content { 
-        display: none; 
-        animation: fadeIn 0.4s ease-in-out;
-    }
-    .tab-content.active { display: block; }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* === FORMULÁRIO === */
-    .form-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-      max-width: 500px;
-      margin: 0 auto;
-    }
-    
-    .form-row {
-        display: flex;
-        gap: 15px;
-    }
-    
-    .input-group {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-    }
-
-    label {
-      font-weight: 600;
-      margin-bottom: 5px;
-      color: var(--dark-text);
-      font-size: 0.9rem;
-    }
-
-    input[type="text"], select, .flatpickr-input {
-      padding: 12px;
-      font-size: 1rem;
-      border-radius: 8px;
-      border: 1px solid var(--border-color);
-      width: 100%;
-      background-color: #fff;
-      transition: border 0.2s;
-    }
-    
-    input:focus, select:focus {
-        border-color: var(--primary-color);
-        outline: none;
-    }
-
-    /* === BOTÕES GERAIS === */
-    .btn {
-        padding: 12px 20px;
-        border-radius: 8px;
-        border: none;
-        font-weight: bold;
-        cursor: pointer;
-        transition: filter 0.2s;
-        font-size: 0.95rem;
-    }
-    .btn:hover { filter: brightness(0.9); }
-    
-    .btn-primary { background-color: var(--primary-color); color: white; width: 100%; margin-top: 10px;}
-    .btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
-    
-    .btn-secondary { background-color: var(--secondary-color); color: white; }
-    .btn-danger { background-color: #fff; color: var(--danger-color); border: 1px solid var(--danger-color); }
-    .btn-danger:hover { background-color: var(--danger-color); color: white; }
-    .btn-share { background-color: #38a169; color: white; }
-    
-    .btn-cancelar {
-        background-color: #e2e8f0;
-        color: var(--dark-text);
-        margin-top: 10px;
-        width: 100%;
-    }
-
-    /* === CARDS DE AGENDAMENTO === */
-    .agendamento-card {
-      background-color: #fff;
-      border-radius: 10px;
-      border-left: 5px solid var(--primary-color);
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-      margin-bottom: 20px;
-      overflow: hidden;
-    }
-    .card-header {
-        background-color: #f8fbff;
-        padding: 12px 20px;
-        border-bottom: 1px solid #edf2f7;
-        display: flex;
-        justify-content: flex-start; 
-        align-items: center;
-    }
-    .card-header h3 { font-size: 1.1rem; color: var(--primary-color); margin: 0;}
-    
-    .card-body { padding: 15px 20px; }
-    .card-body p { margin-bottom: 8px; color: var(--gray-text); line-height: 1.4; }
-    .card-body strong { color: var(--dark-text); }
-    
-    .card-footer {
-        padding: 12px 20px;
-        background-color: #fff;
-        border-top: 1px solid #edf2f7;
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-        justify-content: flex-end;
-    }
-
-    @media (max-width: 600px) {
-      .main-container { padding: 1rem; margin: 10px 5px; }
-      .form-row { flex-direction: column; gap: 0; }
-      .btn-tab { width: 100%; justify-content: center; }
-      .card-footer { justify-content: center; }
-      .btn { flex: 1; }
-    }
-  </style>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon-192x192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="icon-512x512.png" />
-  <meta name="theme-color" content="#007acc" />
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -294,7 +51,6 @@
         
         <div id="tab-cadastro" class="tab-content">
           <div class="form-container">
-            
             <div class="form-row">
                 <div class="input-group">
                     <label for="data-input">Data:</label>
@@ -305,7 +61,6 @@
                     <input type="text" id="hora-input" placeholder="00:00">
                 </div>
             </div>
-
             <div class="input-group">
                 <label for="paciente">Paciente:</label>
                 <select id="paciente" name="paciente">
@@ -313,22 +68,18 @@
                   <option value="Elza">Elza</option>
                 </select>
             </div>
-
             <div class="input-group">
                 <label for="procedimento">Procedimento:</label>
                 <input type="text" id="procedimento" placeholder="Ex: Consulta, Exame de Sangue...">
             </div>
-
             <div class="input-group">
                 <label for="especialidade">Especialidade:</label>
                 <input type="text" id="especialidade" placeholder="Ex: Cardiologista, Clínico...">
             </div>
-
             <div class="input-group">
                 <label for="medico" id="label-medico">Médico:</label>
                 <input type="text" id="medico" placeholder="Nome do médico">
             </div>
-
             <div class="input-group">
                 <label for="local">Local:</label>
                 <input type="text" id="local" placeholder="Ex: Clínica Centro, Hospital X...">
@@ -347,7 +98,6 @@
 
       </div>
   </div>
-  
 </div>
 
   <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -356,295 +106,6 @@
   <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
   <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyA_mJkkpL87mTlRkbPRxHuxObPE1PqqlgE",
-      authDomain: "agenda-medica---eva-e-elza.firebaseapp.com",
-      databaseURL: "https://agenda-medica---eva-e-elza-default-rtdb.firebaseio.com/",
-      projectId: "agenda-medica---eva-e-elza",
-      storageBucket: "agenda-medica---eva-e-elza.firebasestorage.app",
-      messagingSenderId: "664880376825",
-      appId: "1:664880376825:web:3a392e1da6ce2eedf12b28"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
-
-    let agendamentoEmEdicao = null;
-    let modoAdmin = false; 
-    let dadosCache = null;
-
-    // === LÓGICA DE ACESSO ===
-
-    function entrarModoVisitante() {
-        modoAdmin = false;
-        iniciarApp();
-    }
-
-    function entrarModoAdmin() {
-        const senhaDigitada = prompt("Digite a senha de administrador:");
-        if (senhaDigitada === "1001") { 
-            modoAdmin = true;
-            iniciarApp();
-        } else {
-            alert("Senha incorreta!");
-        }
-    }
-
-    function iniciarApp() {
-        document.getElementById('tela-login').classList.add('hidden');
-        document.getElementById('app-principal').classList.remove('hidden');
-
-        // Configura a interface baseada no modo
-        if (modoAdmin) {
-            document.getElementById('btn-tab-cadastro').classList.remove('hidden');
-        } else {
-            document.getElementById('btn-tab-cadastro').classList.add('hidden');
-        }
-
-        // Se já temos dados, renderiza a lista no fundo
-        if (dadosCache) {
-            renderizarLista(dadosCache);
-        }
-    }
-
-    function sairDoApp() {
-        document.getElementById('app-principal').classList.add('hidden');
-        document.getElementById('tela-login').classList.remove('hidden');
-        
-        modoAdmin = false;
-        // Fecha todas as abas
-        document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('active'));
-        document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
-    }
-
-    // === LÓGICA DE ABAS ===
-    function toggleAba(nomeAba) {
-      const abaDestino = document.getElementById(`tab-${nomeAba}`);
-      const btnDestino = document.getElementById(`btn-tab-${nomeAba}`);
-      
-      if (abaDestino.classList.contains('active')) {
-          abaDestino.classList.remove('active');
-          btnDestino.classList.remove('active');
-          return;
-      }
-      abrirAbaDireto(nomeAba);
-    }
-
-    function abrirAbaDireto(nomeAba) {
-        document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('active'));
-        document.querySelectorAll('.btn-tab').forEach(btn => btn.classList.remove('active'));
-        document.getElementById(`tab-${nomeAba}`).classList.add('active');
-        document.getElementById(`btn-tab-${nomeAba}`).classList.add('active');
-    }
-
-    // === CRUD ===
-    function adicionarAgendamento() {
-      if (!modoAdmin) return; 
-
-      const btnSalvar = document.getElementById('btn-salvar');
-      const textoOriginal = btnSalvar.innerText;
-      btnSalvar.innerText = "Salvando...";
-      btnSalvar.disabled = true;
-
-      const data = document.getElementById('data-input').value; 
-      const hora = document.getElementById('hora-input').value;
-      const procedimento = document.getElementById('procedimento').value;
-      const especialidade = document.getElementById('especialidade').value;
-      const local = document.getElementById('local').value;
-      const medico = document.getElementById('medico').value;
-      const paciente = document.getElementById('paciente').value;
-      
-      if (!data || !hora || !procedimento || !paciente) {
-        alert("Preencha Data, Hora, Paciente e Procedimento.");
-        btnSalvar.innerText = textoOriginal;
-        btnSalvar.disabled = false;
-        return;
-      }
-
-      const [ano, mes, dia] = data.split("-");
-      const dataFormatada = `${dia}/${mes}/${ano}`;
-
-      const novoAgendamento = { data: dataFormatada, hora, procedimento, especialidade, local, medico, paciente, timestamp: new Date().toISOString() };
-
-      const referencia = agendamentoEmEdicao ? database.ref('agendamentos/' + agendamentoEmEdicao) : database.ref('agendamentos').push();
-
-      referencia.set(novoAgendamento).then(() => {
-        alert(agendamentoEmEdicao ? "Atualizado!" : "Agendado!");
-        limparCampos();
-        abrirAbaDireto('lista'); 
-      })
-      .catch(error => alert("Erro: " + error.message))
-      .finally(() => {
-          btnSalvar.innerText = "Salvar Agendamento";
-          btnSalvar.disabled = false;
-      });
-    }
-
-    function limparCampos() {
-      document.getElementById('data-input')._flatpickr.clear();
-      document.getElementById('hora-input')._flatpickr.clear();
-      document.getElementById('procedimento').value = '';
-      document.getElementById('especialidade').value = '';
-      document.getElementById('local').value = '';
-      document.getElementById('medico').value = '';
-      document.getElementById('paciente').value = 'Eva';
-      document.getElementById('btn-salvar').innerText = "Salvar Agendamento";
-      document.getElementById('btn-cancelar').style.display = 'none';
-      
-      agendamentoEmEdicao = null;
-      document.getElementById('label-medico').textContent = 'Médico:';
-    }
-
-    function cancelarEdicao() {
-        limparCampos();
-        toggleAba('cadastro'); 
-    }
-
-    function editarAgendamento(id) {
-      if (!modoAdmin) return;
-
-      database.ref('agendamentos/' + id).once('value', snapshot => {
-        const agendamento = snapshot.val();
-        
-        const [dia, mes, ano] = agendamento.data.split("/");
-        const dataParaFlatpickr = `${ano}-${mes}-${dia}`;
-        
-        document.getElementById('data-input')._flatpickr.setDate(dataParaFlatpickr);
-        document.getElementById('hora-input')._flatpickr.setDate(agendamento.hora);
-        
-        document.getElementById('procedimento').value = agendamento.procedimento;
-        document.getElementById('especialidade').value = agendamento.especialidade;
-        document.getElementById('local').value = agendamento.local;
-        document.getElementById('medico').value = agendamento.medico || '';
-        document.getElementById('paciente').value = agendamento.paciente;
-        
-        agendamentoEmEdicao = id;
-        
-        document.getElementById('btn-salvar').innerText = "Atualizar Agendamento";
-        document.getElementById('btn-cancelar').style.display = 'block';
-
-        document.getElementById('procedimento').dispatchEvent(new Event('input'));
-        
-        abrirAbaDireto('cadastro');
-        window.scrollTo(0, 0);
-      });
-    }
-
-    function confirmarExclusao(id) {
-      if (!modoAdmin) return;
-      if (window.confirm("Tem certeza que deseja apagar?")) {
-        database.ref('agendamentos/' + id).remove();
-      }
-    }
-
-    // === LISTAGEM ===
-    
-    function renderizarLista(agendamentos) {
-        const tabela = document.getElementById('agendaTabela');
-        tabela.innerHTML = '';
-        
-        if (!agendamentos) {
-            tabela.innerHTML = '<p style="text-align:center; padding: 20px;">Nenhum agendamento encontrado.</p>';
-            return;
-        }
-
-        Object.keys(agendamentos)
-          .map(id => ({ id, ...agendamentos[id] }))
-          .sort((a, b) => {
-              const [diaA, mesA, anoA] = a.data.split('/');
-              const [diaB, mesB, anoB] = b.data.split('/');
-              const dataA = new Date(`${anoA}-${mesA}-${diaA}T${a.hora || '00:00'}`);
-              const dataB = new Date(`${anoB}-${mesB}-${diaB}T${b.hora || '00:00'}`);
-              return dataA - dataB;
-          })
-          .forEach(agendamento => {
-            const div = document.createElement('div');
-            div.className = 'agendamento-card';
-            div.id = agendamento.id;
-
-            let cardHtml = `
-              <div class="card-header">
-                <h3>${agendamento.paciente}</h3>
-              </div>
-              <div class="card-body">
-                <p><strong>Data:</strong> ${agendamento.data} às ${agendamento.hora}</p>
-                <p><strong>Procedimento:</strong> ${agendamento.procedimento}</p>
-                ${agendamento.especialidade ? `<p><strong>Especialidade:</strong> ${agendamento.especialidade}</p>` : ''}
-                ${agendamento.medico ? `<p><strong>Profissional:</strong> ${agendamento.medico}</p>` : ''}
-                <p><strong>Local:</strong> ${agendamento.local}</p>
-              </div>`;
-
-            if (modoAdmin) {
-              cardHtml += `
-              <div class="card-footer">
-                <button class="btn btn-secondary" onclick="editarAgendamento('${agendamento.id}')">✏️ Editar</button>
-                <button class="btn btn-danger" onclick="confirmarExclusao('${agendamento.id}')">🗑️ Excluir</button>
-                <button class="btn btn-share" onclick="compartilharImagem('${agendamento.id}')">📷 Compartilhar</button>
-              </div>`;
-            }
-
-            div.innerHTML = cardHtml;
-            tabela.appendChild(div);
-          });
-    }
-
-    const agendaRef = database.ref('agendamentos');
-    agendaRef.on('value', snapshot => {
-      dadosCache = snapshot.val();
-      renderizarLista(dadosCache);
-    });
-
-    // === CORREÇÃO: COMPARTILHAR SEM OS BOTÕES ===
-    function compartilharImagem(agendamentoId) {
-      const agendamentoCard = document.getElementById(agendamentoId);
-      
-      // 1. Encontra o rodapé dos botões
-      const rodapeBotoes = agendamentoCard.querySelector('.card-footer');
-
-      // 2. Esconde antes da foto
-      if (rodapeBotoes) {
-        rodapeBotoes.style.display = 'none';
-      }
-
-      html2canvas(agendamentoCard, {
-        onrendered: canvas => {
-          // Salva imagem
-          const imagem = canvas.toDataURL('image/jpeg');
-          const link = document.createElement('a');
-          link.href = imagem;
-          link.download = 'agendamento.jpg';
-          link.click();
-
-          // 3. Restaura os botões
-          if (rodapeBotoes) {
-            rodapeBotoes.style.display = 'flex';
-          }
-        }
-      });
-    }
-
-    // === ATUALIZAÇÃO AUTOMÁTICA DO PWA ===
-    if ('serviceWorker' in navigator) {
-      let refreshing = false;
-      navigator.serviceWorker.addEventListener('controllerchange', () => {
-        if (!refreshing) {
-          window.location.reload();
-          refreshing = true;
-        }
-      });
-      navigator.serviceWorker.register('service-worker.js');
-    }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      flatpickr.localize(flatpickr.l10ns.pt);
-      flatpickr("#data-input", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m/Y", disableMobile: false });
-      flatpickr("#hora-input", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
-      document.getElementById('procedimento').addEventListener('input', function(event) {
-        const texto = event.target.value.toLowerCase();
-        document.getElementById('label-medico').textContent = texto.includes('exame') ? 'Médico Solicitante:' : 'Médico:';
-      });
-    });
-  </script>
+  <script src="app.js" defer></script>
 </body>
 </html>

@@ -1,0 +1,243 @@
+/* === VARIÁVEIS E GLOBAIS === */
+:root {
+  --primary-color: #007acc;
+  --secondary-color: #5a67d8;
+  --danger-color: #e53e3e;
+  --light-gray: #f7fafc;
+  --gray-text: #4a5568;
+  --dark-text: #2d3748;
+  --border-color: #e2e8f0;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background-color: var(--light-gray);
+  color: var(--gray-text);
+  padding: 20px;
+}
+
+.main-container {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    min-height: 80vh; 
+}
+
+/* Utilitário para esconder elementos */
+.hidden { display: none !important; }
+
+h1 {
+  text-align: center;
+  color: var(--dark-text);
+  margin-bottom: 2rem;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+/* === TELA DE LOGIN / INICIAL === */
+.login-screen {
+    text-align: center;
+    padding: 40px 20px;
+}
+.login-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 300px;
+    margin: 0 auto;
+}
+.btn-login {
+    padding: 15px;
+    font-size: 1.1rem;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    color: white;
+}
+.btn-login:active { transform: scale(0.98); }
+.btn-visitante { background-color: var(--secondary-color); }
+.btn-admin { background-color: var(--primary-color); }
+
+/* Header Interno com botão voltar */
+.app-header {
+    position: relative;
+    margin-bottom: 20px;
+}
+.btn-voltar {
+    position: absolute;
+    left: 0;
+    top: 5px;
+    background: #e2e8f0;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 15px;
+    cursor: pointer;
+    font-weight: bold;
+    color: var(--gray-text);
+}
+.btn-voltar:hover { background: #cbd5e0; }
+
+/* === NAVEGAÇÃO (ABAS) === */
+.tabs-navigation {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.btn-tab {
+    background-color: white;
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 700;
+    padding: 12px 30px;
+    border-radius: 50px; 
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-tab:hover {
+    background-color: #e6f7ff;
+    transform: translateY(-2px);
+}
+
+.btn-tab.active {
+    background-color: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 122, 204, 0.4);
+}
+
+.tab-content { 
+    display: none; 
+    animation: fadeIn 0.4s ease-in-out;
+}
+.tab-content.active { display: block; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* === FORMULÁRIO === */
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+
+.input-group {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: var(--dark-text);
+  font-size: 0.9rem;
+}
+
+input[type="text"], select, .flatpickr-input {
+  padding: 12px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  width: 100%;
+  background-color: #fff;
+  transition: border 0.2s;
+}
+
+input:focus, select:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+/* === BOTÕES GERAIS === */
+.btn {
+    padding: 12px 20px;
+    border-radius: 8px;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    transition: filter 0.2s;
+    font-size: 0.95rem;
+}
+.btn:hover { filter: brightness(0.9); }
+
+.btn-primary { background-color: var(--primary-color); color: white; width: 100%; margin-top: 10px;}
+.btn-primary:disabled { background-color: #ccc; cursor: not-allowed; }
+
+.btn-secondary { background-color: var(--secondary-color); color: white; }
+.btn-danger { background-color: #fff; color: var(--danger-color); border: 1px solid var(--danger-color); }
+.btn-danger:hover { background-color: var(--danger-color); color: white; }
+.btn-share { background-color: #38a169; color: white; }
+
+.btn-cancelar {
+    background-color: #e2e8f0;
+    color: var(--dark-text);
+    margin-top: 10px;
+    width: 100%;
+}
+
+/* === CARDS DE AGENDAMENTO === */
+.agendamento-card {
+  background-color: #fff;
+  border-radius: 10px;
+  border-left: 5px solid var(--primary-color);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+  overflow: hidden;
+}
+.card-header {
+    background-color: #f8fbff;
+    padding: 12px 20px;
+    border-bottom: 1px solid #edf2f7;
+    display: flex;
+    justify-content: flex-start; 
+    align-items: center;
+}
+.card-header h3 { font-size: 1.1rem; color: var(--primary-color); margin: 0;}
+
+.card-body { padding: 15px 20px; }
+.card-body p { margin-bottom: 8px; color: var(--gray-text); line-height: 1.4; }
+.card-body strong { color: var(--dark-text); }
+
+.card-footer {
+    padding: 12px 20px;
+    background-color: #fff;
+    border-top: 1px solid #edf2f7;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+@media (max-width: 600px) {
+  .main-container { padding: 1rem; margin: 10px 5px; }
+  .form-row { flex-direction: column; gap: 0; }
+  .btn-tab { width: 100%; justify-content: center; }
+  .card-footer { justify-content: center; }
+  .btn { flex: 1; }
+}
