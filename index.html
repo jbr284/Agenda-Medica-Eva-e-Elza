@@ -1,115 +1,89 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Agenda Médica de Eva e Elza</title>
-  
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icon-192x192.png" sizes="192x192" type="image/png" />
-  <link rel="apple-touch-icon" href="icon-512x512.png" />
-  <meta name="theme-color" content="#007acc" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Absenteísmo</title>
+    <style>
+        /* Reset de margens e definição da fonte do sistema */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  
-  <link rel="stylesheet" href="styles.css">
+        /* O body como flex container garante que o rodapé fique sempre no fundo */
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f4f7f6; /* Fundo cinza bem claro, típico de softwares */
+        }
+
+        /* Cabeçalho: A "borda" superior */
+        header {
+            background-color: #2c3e50; /* Azul escuro corporativo */
+            color: #ffffff;
+            padding: 12px 24px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.25rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Área principal do sistema */
+        main {
+            flex: 1; /* Faz essa área expandir e empurrar o rodapé para baixo */
+            padding: 24px;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto; /* Centraliza em monitores muito grandes */
+        }
+
+        /* Painel branco onde os dados e calendários vão ficar */
+        .painel-sistema {
+            background-color: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e1e4e8;
+            padding: 24px;
+            min-height: 500px; /* Só para visualização inicial */
+        }
+
+        .painel-sistema h2 {
+            color: #333;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /* Rodapé: A "borda" inferior limpa */
+        footer {
+            background-color: #e1e4e8;
+            height: 32px; /* Barra fina e discreta */
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
 
-<div class="main-container">
+    <header>
+        <h1>Controle de Absenteísmo</h1>
+    </header>
 
-  <div id="tela-login" class="login-screen">
-      <h1>Agenda Médica<br>Eva e Elza</h1>
-      <p style="margin-bottom: 30px; color: #666;">Selecione como deseja acessar:</p>
-      
-      <div class="login-buttons">
-          <button class="btn-login btn-visitante" onclick="entrarModoVisitante()">👁️Visualizar Agenda</button>
-          <button class="btn-login btn-admin" onclick="entrarModoAdmin()">🔐 Área Restrita (Agendar)</button>
-      </div>
-  </div>
-
-  <div id="app-principal" class="hidden">
-      
-      <div class="app-header">
-          <button class="btn-voltar" onclick="sairDoApp()">⬅ Sair</button>
-          <h1>Agenda Médica</h1>
-      </div>
-
-      <div class="tabs-navigation">
-        <button id="btn-tab-lista" class="btn-tab" onclick="toggleAba('lista')">
-          📅 Consultas Agendadas
-        </button>
-        <button id="btn-tab-cadastro" class="btn-tab hidden" onclick="toggleAba('cadastro')">
-          ➕ Novo Agendamento
-        </button>
-      </div>
-
-      <div id="conteudo-abas">
-        
-        <div id="tab-cadastro" class="tab-content">
-          <div class="form-container">
-            
-            <div class="form-row">
-                <div class="input-group">
-                    <label for="data-input">Data:</label>
-                    <input type="text" id="data-input" placeholder="Selecione a data...">
-                </div>
-                <div class="input-group">
-                    <label for="hora-input">Hora:</label>
-                    <input type="text" id="hora-input" placeholder="00:00">
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label for="paciente">Paciente:</label>
-                <select id="paciente" name="paciente">
-                  <option value="Eva">Eva</option>
-                  <option value="Elza">Elza</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label for="procedimento">Procedimento:</label>
-                <input type="text" id="procedimento" placeholder="Ex: Consulta, Exame de Sangue...">
-            </div>
-
-            <div class="input-group">
-                <label for="especialidade">Especialidade:</label>
-                <input type="text" id="especialidade" placeholder="Ex: Cardiologista, Clínico...">
-            </div>
-
-            <div class="input-group">
-                <label for="medico" id="label-medico">Médico:</label>
-                <input type="text" id="medico" placeholder="Nome do médico">
-            </div>
-
-            <div class="input-group">
-                <label for="local">Local:</label>
-                <input type="text" id="local" placeholder="Ex: Clínica Centro, Hospital X...">
-            </div>
-
-            <button type="button" id="btn-salvar" class="btn btn-primary" onclick="adicionarAgendamento()">Salvar Agendamento</button>
-            <button type="button" id="btn-cancelar" class="btn btn-cancelar hidden" onclick="cancelarEdicao()">Cancelar Edição</button>
-          </div>
+    <main>
+        <div class="painel-sistema">
+            <h2>Gestão de Escalas e Faltas</h2>
+            <p style="color: #666;">A interface principal do seu sistema de agendamento entrará aqui.</p>
         </div>
+    </main>
 
-        <div id="tab-lista" class="tab-content">
-          <div id="agendaTabela">
-              <p style="text-align: center; color: #aaa; margin-top: 20px;">Carregando agendamentos...</p>
-          </div>
-        </div>
+    <footer></footer>
 
-      </div>
-  </div>
-</div>
-
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/pt.js"></script> <script src="app.js" defer></script>
 </body>
 </html>
