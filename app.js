@@ -57,6 +57,7 @@ function sairDoApp() {
 }
 
 // === LÓGICA DE ABAS ===
+
 function toggleAba(nomeAba) {
   const abaDestino = document.getElementById(`tab-${nomeAba}`);
   const btnDestino = document.getElementById(`btn-tab-${nomeAba}`);
@@ -77,6 +78,7 @@ function abrirAbaDireto(nomeAba) {
 }
 
 // === CRUD ===
+
 function adicionarAgendamento() {
   if (!modoAdmin) return; 
 
@@ -120,15 +122,21 @@ function adicionarAgendamento() {
 }
 
 function limparCampos() {
-  document.getElementById('data-input')._flatpickr.clear();
-  document.getElementById('hora-input')._flatpickr.clear();
+  const dataInput = document.getElementById('data-input')._flatpickr;
+  const horaInput = document.getElementById('hora-input')._flatpickr;
+  
+  if(dataInput) dataInput.clear();
+  if(horaInput) horaInput.clear();
+  
   document.getElementById('procedimento').value = '';
   document.getElementById('especialidade').value = '';
   document.getElementById('local').value = '';
   document.getElementById('medico').value = '';
   document.getElementById('paciente').value = 'Eva';
   document.getElementById('btn-salvar').innerText = "Salvar Agendamento";
-  document.getElementById('btn-cancelar').style.display = 'none';
+  
+  const btnCancelar = document.getElementById('btn-cancelar');
+  if(btnCancelar) btnCancelar.classList.add('hidden');
   
   agendamentoEmEdicao = null;
   document.getElementById('label-medico').textContent = 'Médico:';
@@ -144,23 +152,27 @@ function editarAgendamento(id) {
 
   database.ref('agendamentos/' + id).once('value', snapshot => {
     const agendamento = snapshot.val();
+    if (!agendamento) return;
     
     const [dia, mes, ano] = agendamento.data.split("/");
     const dataParaFlatpickr = `${ano}-${mes}-${dia}`;
     
-    document.getElementById('data-input')._flatpickr.setDate(dataParaFlatpickr);
-    document.getElementById('hora-input')._flatpickr.setDate(agendamento.hora);
+    const dataInput = document.getElementById('data-input')._flatpickr;
+    const horaInput = document.getElementById('hora-input')._flatpickr;
     
-    document.getElementById('procedimento').value = agendamento.procedimento;
-    document.getElementById('especialidade').value = agendamento.especialidade;
-    document.getElementById('local').value = agendamento.local;
+    if(dataInput) dataInput.setDate(dataParaFlatpickr);
+    if(horaInput) horaInput.setDate(agendamento.hora);
+    
+    document.getElementById('procedimento').value = agendamento.procedimento || '';
+    document.getElementById('especialidade').value = agendamento.especialidade || '';
+    document.getElementById('local').value = agendamento.local || '';
     document.getElementById('medico').value = agendamento.medico || '';
-    document.getElementById('paciente').value = agendamento.paciente;
+    document.getElementById('paciente').value = agendamento.paciente || 'Eva';
     
     agendamentoEmEdicao = id;
     
     document.getElementById('btn-salvar').innerText = "Atualizar Agendamento";
-    document.getElementById('btn-cancelar').style.display = 'block';
+    document.getElementById('btn-cancelar').classList.remove('hidden');
 
     document.getElementById('procedimento').dispatchEvent(new Event('input'));
     
@@ -230,34 +242,34 @@ function renderizarLista(agendamentos) {
 const agendaRef = database.ref('agendamentos');
 agendaRef.on('value', snapshot => {
   dadosCache = snapshot.val();
-  renderizarLista(dadosCache);
+  if (document.getElementById('app-principal').classList.contains('hidden') === false) {
+      renderizarLista(dadosCache);
+  }
 });
 
-// === CORREÇÃO: COMPARTILHAR SEM OS BOTÕES ===
+// === COMPARTILHAMENTO ===
+
 function compartilharImagem(agendamentoId) {
   const agendamentoCard = document.getElementById(agendamentoId);
   const rodapeBotoes = agendamentoCard.querySelector('.card-footer');
 
-  if (rodapeBotoes) {
-    rodapeBotoes.style.display = 'none';
-  }
+  if (rodapeBotoes) rodapeBotoes.style.display = 'none';
 
   html2canvas(agendamentoCard, {
     onrendered: canvas => {
       const imagem = canvas.toDataURL('image/jpeg');
       const link = document.createElement('a');
       link.href = imagem;
-      link.download = 'agendamento.jpg';
+      link.download = `agendamento_${agendamentoId}.jpg`;
       link.click();
 
-      if (rodapeBotoes) {
-        rodapeBotoes.style.display = 'flex';
-      }
+      if (rodapeBotoes) rodapeBotoes.style.display = 'flex';
     }
   });
 }
 
-// === ATUALIZAÇÃO AUTOMÁTICA DO PWA ===
+// === INICIALIZAÇÃO PWA E EVENTOS ===
+
 if ('serviceWorker' in navigator) {
   let refreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -266,15 +278,19 @@ if ('serviceWorker' in navigator) {
       refreshing = true;
     }
   });
-  navigator.serviceWorker.register('service-worker.js');
+  navigator.serviceWorker.register('service-worker.js').catch(err => console.error("Erro no SW:", err));
 }
 
 window.addEventListener('DOMContentLoaded', () => {
   flatpickr.localize(flatpickr.l10ns.pt);
   flatpickr("#data-input", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m/Y", disableMobile: false });
   flatpickr("#hora-input", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
-  document.getElementById('procedimento').addEventListener('input', function(event) {
-    const texto = event.target.value.toLowerCase();
-    document.getElementById('label-medico').textContent = texto.includes('exame') ? 'Médico Solicitante:' : 'Médico:';
-  });
+  
+  const procInput = document.getElementById('procedimento');
+  if(procInput) {
+      procInput.addEventListener('input', function(event) {
+        const texto = event.target.value.toLowerCase();
+        document.getElementById('label-medico').textContent = texto.includes('exame') ? 'Médico Solicitante:' : 'Médico:';
+      });
+  }
 });
