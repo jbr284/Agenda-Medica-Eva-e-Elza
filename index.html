@@ -83,23 +83,27 @@
 
                   <div class="input-group">
                       <label for="procedimento">Procedimento Realizado</label>
-                      <input type="text" id="procedimento" placeholder="Ex: Consulta de Rotina, Exame de Sangue...">
+                      <input type="text" id="procedimento" list="lista-procedimentos" placeholder="Ex: Consulta, Exame de Sangue...">
+                      <datalist id="lista-procedimentos"></datalist>
                   </div>
 
                   <div class="form-row">
                       <div class="input-group">
                           <label for="especialidade">Especialidade</label>
-                          <input type="text" id="especialidade" placeholder="Ex: Cardiologia...">
+                          <input type="text" id="especialidade" list="lista-especialidades" placeholder="Ex: Cardiologia...">
+                          <datalist id="lista-especialidades"></datalist>
                       </div>
                       <div class="input-group">
                           <label for="medico" id="label-medico">Profissional</label>
-                          <input type="text" id="medico" placeholder="Nome do médico...">
+                          <input type="text" id="medico" list="lista-medicos" placeholder="Nome do médico...">
+                          <datalist id="lista-medicos"></datalist>
                       </div>
                   </div>
 
                   <div class="input-group">
                       <label for="local">Local de Atendimento</label>
-                      <input type="text" id="local" placeholder="Ex: Clínica Centro, Hospital Municipal...">
+                      <input type="text" id="local" list="lista-locais" placeholder="Ex: UBS Centro, Hospital X...">
+                      <datalist id="lista-locais"></datalist>
                   </div>
 
                   <div class="form-actions">
