@@ -12,10 +12,92 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
+// === VARIÁVEIS GLOBAIS ===
 let agendamentoEmEdicao = null;
 let modoAdmin = false; 
 let dadosCache = null;
 let filtroAtual = 'Todas';
+
+// === BASES DE CONHECIMENTO (O CÉREBRO DO SISTEMA) ===
+let listaProcedimentosAtuais = [];
+let listaEspecialidadesAtuais = [];
+let listaLocaisAtuais = [];
+let listaMedicosAtuais = [];
+
+const baseProcedimentos = ["Consulta", "Exame", "Retorno", "Cirurgia", "Vacina", "Avaliação"];
+const baseLocais = [
+    "UBS Amaro José de Souza - Jd Mutinga",
+    "UBS Armando Gonçalves de Freitas - Pq Imperial",
+    "PS Maria de Lourdes Evangelista - Jd Mutinga",
+    "Hospital Municipal Dr. Francisco Moran",
+    "Centro de Diagnósticos Maria Mariano Meneghin",
+    "Centro de Especialidades Luiz Maria Barletta",
+    "Policlínica Cruz Preta/Engenho Novo"
+];
+const baseEspecialidades = [
+    "Alergologia", "Anestesiologia", "Angiologia", "Cardiologia", "Cirurgia Geral", 
+    "Cirurgia Plástica", "Cirurgia Vascular", "Clínico Geral", "Coloproctologia", 
+    "Dermatologia", "Endocrinologia", "Fisioterapia", "Fonoaudiologia", 
+    "Gastroenterologia", "Geriatria", "Ginecologia", "Hematologia", "Hepatologia", 
+    "Infectologia", "Mastologia", "Medicina do Trabalho", "Nefrologia", "Neurologia", 
+    "Nutrição", "Nutrologia", "Obstetrícia", "Odontologia", "Oftalmologia", 
+    "Oncologia", "Ortopedia", "Otorrinolaringologia", "Pediatria", "Pneumologia", 
+    "Psicologia", "Psiquiatria", "Radiologia", "Reumatologia", "Urologia"
+];
+
+// === MOTOR DE AUTO-PREENCHIMENTO E APRENDIZADO ===
+function inicializarListasDinamicas() {
+    // Sincroniza Procedimentos
+    database.ref('configuracoes/procedimentos').on('value', snap => {
+        let salvas = snap.val() ? Object.values(snap.val()) : [];
+        listaProcedimentosAtuais = [...new Set([...baseProcedimentos, ...salvas])].sort();
+        preencherDatalist('lista-procedimentos', listaProcedimentosAtuais);
+    });
+
+    // Sincroniza Especialidades
+    database.ref('configuracoes/especialidades').on('value', snap => {
+        let salvas = snap.val() ? Object.values(snap.val()) : [];
+        listaEspecialidadesAtuais = [...new Set([...baseEspecialidades, ...salvas])].sort();
+        preencherDatalist('lista-especialidades', listaEspecialidadesAtuais);
+    });
+
+    // Sincroniza Locais
+    database.ref('configuracoes/locais').on('value', snap => {
+        let salvas = snap.val() ? Object.values(snap.val()) : [];
+        listaLocaisAtuais = [...new Set([...baseLocais, ...salvas])].sort();
+        preencherDatalist('lista-locais', listaLocaisAtuais);
+    });
+
+    // Sincroniza Médicos
+    database.ref('configuracoes/medicos').on('value', snap => {
+        let salvas = snap.val() ? Object.values(snap.val()) : [];
+        listaMedicosAtuais = [...new Set([...salvas])].sort();
+        preencherDatalist('lista-medicos', listaMedicosAtuais);
+    });
+}
+
+function preencherDatalist(idElemento, arrayDados) {
+    const datalist = document.getElementById(idElemento);
+    if (!datalist) return;
+    datalist.innerHTML = '';
+    arrayDados.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item;
+        datalist.appendChild(option);
+    });
+}
+
+function aprenderNovoTermo(caminho, termoDigitado, listaAtual) {
+    if (!termoDigitado || termoDigitado.trim() === "") return;
+    const termoFormatado = termoDigitado.trim().charAt(0).toUpperCase() + termoDigitado.trim().slice(1);
+    
+    // Verifica se o termo já existe ignorando maiúsculas/minúsculas
+    const termoExiste = listaAtual.some(item => item.toLowerCase() === termoFormatado.toLowerCase());
+    
+    if (!termoExiste) {
+        database.ref(`configuracoes/${caminho}`).push(termoFormatado);
+    }
+}
 
 // === LÓGICA DE ACESSO ===
 function entrarModoVisitante() {
@@ -82,7 +164,7 @@ function aplicarFiltro(paciente) {
     renderizarLista(dadosCache);
 }
 
-// === CRUD ===
+// === CRUD COM APRENDIZADO ===
 function adicionarAgendamento() {
     if (!modoAdmin) return; 
 
@@ -108,6 +190,13 @@ function adicionarAgendamento() {
     const [ano, mes, dia] = data.split("-");
     const dataFormatada = `${dia}/${mes}/${ano}`;
     const novoAgendamento = { data: dataFormatada, hora, procedimento, especialidade, local, medico, paciente, timestamp: new Date().toISOString() };
+    
+    // ATIVA O CÉREBRO: O robô aprende os termos recém digitados
+    aprenderNovoTermo('procedimentos', procedimento, listaProcedimentosAtuais);
+    aprenderNovoTermo('locais', local, listaLocaisAtuais);
+    if (especialidade) aprenderNovoTermo('especialidades', especialidade, listaEspecialidadesAtuais);
+    if (medico) aprenderNovoTermo('medicos', medico, listaMedicosAtuais);
+
     const referencia = agendamentoEmEdicao ? database.ref('agendamentos/' + agendamentoEmEdicao) : database.ref('agendamentos').push();
 
     referencia.set(novoAgendamento).then(() => {
@@ -179,7 +268,7 @@ async function confirmarExclusao(id) {
     }
 }
 
-// === RENDERIZAÇÃO DE CARDS PREMIUM ===
+// === RENDERIZAÇÃO DE CARDS ===
 function renderizarLista(agendamentos) {
     const tabela = document.getElementById('agendaTabela');
     tabela.innerHTML = '';
@@ -199,7 +288,6 @@ function renderizarLista(agendamentos) {
             const [dia, mes, ano] = a.data.split('/');
             a.dataObj = new Date(`${ano}-${mes}-${dia}T${a.hora || '00:00'}`);
             
-            // Lógica de tempo para os Badges
             const dataBase = new Date(`${ano}-${mes}-${dia}T00:00:00`);
             const diffTime = dataBase - hojeObj;
             a.diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -228,7 +316,6 @@ function renderizarLista(agendamentos) {
         const [dia, mes] = ag.data.split('/');
         const nomeMes = mesesAbrev[parseInt(mes) - 1];
 
-        // Lógica de Badges
         let badgeHtml = '';
         if (ag.passou) badgeHtml = `<span class="badge-concluido"><i class="ph-bold ph-check-circle"></i> Concluído</span>`;
         else if (ag.diffDays === 0) badgeHtml = `<span class="badge-hoje"><i class="ph-fill ph-warning-circle"></i> Hoje!</span>`;
@@ -316,4 +403,7 @@ window.addEventListener('DOMContentLoaded', () => {
     flatpickr.localize(flatpickr.l10ns.pt);
     flatpickr("#data-input", { dateFormat: "Y-m-d", altInput: true, altFormat: "d/m/Y", disableMobile: false, minDate: "today" });
     flatpickr("#hora-input", { enableTime: true, noCalendar: true, dateFormat: "H:i", time_24hr: true });
+    
+    // INICIA O CÉREBRO DE APRENDIZADO
+    inicializarListasDinamicas();
 });
